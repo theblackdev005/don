@@ -1,0 +1,439 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Mail\FundingDonationActMail;
+use App\Mail\FundingDonationActSentAdminMail;
+use App\Mail\FundingPreliminaryAcceptedMail;
+use App\Mail\FundingPreliminarySentAdminMail;
+use App\Mail\FundingRequestReceivedAdminMail;
+use App\Mail\FundingRequestReceivedApplicantMail;
+use App\Mail\FundingRequestRefusedMail;
+use App\Models\FundingRequest;
+use App\Models\User;
+use App\Services\DonationActPdfService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Mockery\MockInterface;
+use Tests\TestCase;
+
+class FundingRequestFlowTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_customer_can_submit_a_funding_request(): void
+    {
+        Mail::fake();
+        $admin = User::factory()->create([
+            'is_admin' => true,
+            'email' => 'admin@example.test',
+        ]);
+        config(['admin.notification_email' => $admin->email]);
+
+        $response = $this->post(route('funding-request.store', ['locale' => 'fr']), [
+            'full_name' => 'Jean Dupont',
+            'country' => 'France',
+            'address' => '10 rue de Paris, 75001 Paris',
+            'email' => 'jean@example.test',
+            'phone_prefix' => '+33',
+            'phone' => '612345678',
+            'current_situation' => FundingRequest::CURRENT_SITUATION_SALARIED,
+            'monthly_income_approx' => '1800 EUR',
+            'family_situation' => FundingRequest::FAMILY_SINGLE,
+            'amount_requested' => 50000,
+            'need_type' => FundingRequest::NEED_PERSONAL,
+            'situation' => 'Je traverse une période difficile et j’ai besoin d’un soutien.',
+            'declare_accurate' => '1',
+        ]);
+
+        $fundingRequest = FundingRequest::query()->first();
+
+        $response->assertRedirect(route('funding-request.success', [
+            'locale' => 'fr',
+            'public_slug' => $fundingRequest->public_slug,
+        ]));
+
+        $this->assertNotNull($fundingRequest);
+        $this->assertSame(FundingRequest::STATUS_PENDING, $fundingRequest->status);
+        $this->assertSame('Jean Dupont', $fundingRequest->full_name);
+        $this->assertSame('fr', $fundingRequest->locale);
+        $this->assertNotEmpty($fundingRequest->dossier_number);
+        $this->assertNotEmpty($fundingRequest->public_slug);
+
+        Mail::assertSent(FundingRequestReceivedApplicantMail::class, function ($mail) use ($fundingRequest) {
+            return $mail->hasTo($fundingRequest->email);
+        });
+
+        Mail::assertSent(FundingRequestReceivedAdminMail::class, function ($mail) use ($admin) {
+            return $mail->hasTo($admin->email);
+        });
+    }
+
+    public function test_customer_cannot_submit_twice_with_same_email(): void
+    {
+        FundingRequest::factory()->create([
+            'email' => 'client@example.test',
+            'phone_prefix' => '+33',
+            'phone' => '612345678',
+        ]);
+
+        $response = $this->from(route('funding-request.create', ['locale' => 'fr']))
+            ->post(route('funding-request.store', ['locale' => 'fr']), [
+                'full_name' => 'Jean Dupont',
+                'country' => 'France',
+                'address' => '10 rue de Paris, 75001 Paris',
+                'email' => 'client@example.test',
+                'phone_prefix' => '+33',
+                'phone' => '699999999',
+                'current_situation' => FundingRequest::CURRENT_SITUATION_SALARIED,
+                'monthly_income_approx' => '1800 EUR',
+                'family_situation' => FundingRequest::FAMILY_SINGLE,
+                'amount_requested' => 50000,
+                'need_type' => FundingRequest::NEED_PERSONAL,
+                'situation' => 'Nouvelle demande',
+                'declare_accurate' => '1',
+            ]);
+
+        $response->assertRedirect(route('funding-request.create', ['locale' => 'fr']));
+        $response->assertSessionHasErrors('email');
+        $this->assertSame(1, FundingRequest::query()->count());
+    }
+
+    public function test_customer_cannot_submit_twice_with_same_phone_even_if_format_changes(): void
+    {
+        FundingRequest::factory()->create([
+            'email' => 'existing@example.test',
+            'phone_prefix' => '+33',
+            'phone' => '612345678',
+        ]);
+
+        $response = $this->from(route('funding-request.create', ['locale' => 'fr']))
+            ->post(route('funding-request.store', ['locale' => 'fr']), [
+                'full_name' => 'Jean Dupont',
+                'country' => 'France',
+                'address' => '10 rue de Paris, 75001 Paris',
+                'email' => 'new@example.test',
+                'phone_prefix' => '+33',
+                'phone' => '6 12 34 56 78',
+                'current_situation' => FundingRequest::CURRENT_SITUATION_SALARIED,
+                'monthly_income_approx' => '1800 EUR',
+                'family_situation' => FundingRequest::FAMILY_SINGLE,
+                'amount_requested' => 50000,
+                'need_type' => FundingRequest::NEED_PERSONAL,
+                'situation' => 'Nouvelle demande',
+                'declare_accurate' => '1',
+            ]);
+
+        $response->assertRedirect(route('funding-request.create', ['locale' => 'fr']));
+        $response->assertSessionHasErrors('phone');
+        $this->assertSame(1, FundingRequest::query()->count());
+    }
+
+    public function test_documents_upload_can_complete_a_dossier(): void
+    {
+        Storage::fake('local');
+        Mail::fake();
+
+        $fundingRequest = FundingRequest::factory()->create([
+            'status' => FundingRequest::STATUS_AWAITING_DOCUMENTS,
+            'identity_document_type' => FundingRequest::IDENTITY_DOCUMENT_ID_CARD,
+        ]);
+
+        $response = $this->post(route('funding-request.documents.store', [
+            'locale' => 'fr',
+            'public_slug' => $fundingRequest->public_slug,
+        ]), [
+            'identity_document_type' => FundingRequest::IDENTITY_DOCUMENT_ID_CARD,
+            'doc_id_front' => UploadedFile::fake()->image('front.jpg'),
+            'doc_id_back' => UploadedFile::fake()->image('back.jpg'),
+            'doc_situation' => UploadedFile::fake()->create('situation.pdf', 120, 'application/pdf'),
+        ]);
+
+        $fundingRequest->refresh();
+
+        $response->assertRedirect(route('funding-request.success', [
+            'locale' => 'fr',
+            'public_slug' => $fundingRequest->public_slug,
+            'context' => 'documents',
+        ]));
+
+        $this->assertSame(FundingRequest::STATUS_DOCUMENTS_RECEIVED, $fundingRequest->status);
+        $this->assertNotNull($fundingRequest->doc_id_front_path);
+        $this->assertNotNull($fundingRequest->doc_id_back_path);
+        $this->assertNotNull($fundingRequest->doc_situation_path);
+        Storage::disk('local')->assertExists($fundingRequest->doc_id_front_path);
+        Storage::disk('local')->assertExists($fundingRequest->doc_id_back_path);
+    }
+
+    public function test_admin_can_refuse_with_reason_and_reactivate(): void
+    {
+        Mail::fake();
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+
+        $fundingRequest = FundingRequest::factory()->create([
+            'status' => FundingRequest::STATUS_PENDING,
+        ]);
+
+        $refuseResponse = $this->actingAs($admin)
+            ->post(route('admin.funding-requests.refuse', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]), [
+                'refused_reason' => 'Le dossier ne remplit pas les conditions actuelles du programme.',
+            ]);
+
+        $fundingRequest->refresh();
+
+        $refuseResponse->assertSessionHasNoErrors();
+        $this->assertSame(FundingRequest::STATUS_REFUSED, $fundingRequest->status);
+        $this->assertSame('Le dossier ne remplit pas les conditions actuelles du programme.', $fundingRequest->refused_reason);
+
+        Mail::assertSent(FundingRequestRefusedMail::class, function ($mail) use ($fundingRequest) {
+            return $mail->hasTo($fundingRequest->email);
+        });
+
+        $reactivateResponse = $this->actingAs($admin)
+            ->post(route('admin.funding-requests.reactivate', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]));
+
+        $fundingRequest->refresh();
+
+        $reactivateResponse->assertSessionHasNoErrors();
+        $this->assertSame(FundingRequest::STATUS_PENDING, $fundingRequest->status);
+        $this->assertNull($fundingRequest->refused_reason);
+    }
+
+    public function test_admin_can_send_preliminary_validation_and_move_dossier_to_documents_stage(): void
+    {
+        Mail::fake();
+
+        $admin = User::factory()->create([
+            'is_admin' => true,
+            'email' => 'admin@example.test',
+        ]);
+        config(['admin.notification_email' => $admin->email]);
+
+        $fundingRequest = FundingRequest::factory()->create([
+            'status' => FundingRequest::STATUS_PENDING,
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->post(route('admin.funding-requests.preliminary', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]));
+
+        $fundingRequest->refresh();
+
+        $response->assertSessionHasNoErrors();
+        $this->assertSame(FundingRequest::STATUS_AWAITING_DOCUMENTS, $fundingRequest->status);
+
+        Mail::assertSent(FundingPreliminaryAcceptedMail::class, function ($mail) use ($fundingRequest) {
+            return $mail->hasTo($fundingRequest->email);
+        });
+
+        Mail::assertSent(FundingPreliminarySentAdminMail::class, function ($mail) use ($admin) {
+            return $mail->hasTo($admin->email);
+        });
+    }
+
+    public function test_admin_cannot_refuse_a_dossier_without_reason(): void
+    {
+        Mail::fake();
+
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+
+        $fundingRequest = FundingRequest::factory()->create([
+            'status' => FundingRequest::STATUS_PENDING,
+        ]);
+
+        $response = $this->from(route('admin.funding-requests.show', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]))
+            ->actingAs($admin)
+            ->post(route('admin.funding-requests.refuse', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]), [
+                'refused_reason' => '',
+            ]);
+
+        $fundingRequest->refresh();
+
+        $response->assertRedirect(route('admin.funding-requests.show', [
+            'locale' => 'fr',
+            'fundingRequest' => $fundingRequest,
+        ]));
+        $response->assertSessionHasErrors('refused_reason');
+        $this->assertSame(FundingRequest::STATUS_PENDING, $fundingRequest->status);
+        $this->assertNull($fundingRequest->refused_reason);
+        Mail::assertNothingSent();
+    }
+
+    public function test_admin_can_grant_donation_when_documents_are_complete(): void
+    {
+        Storage::fake('local');
+        Mail::fake();
+
+        $admin = User::factory()->create([
+            'is_admin' => true,
+            'email' => 'admin@example.test',
+        ]);
+        config(['admin.notification_email' => $admin->email]);
+
+        $fundingRequest = FundingRequest::factory()->create([
+            'status' => FundingRequest::STATUS_DOCUMENTS_RECEIVED,
+            'doc_id_front_path' => 'funding-documents/front.jpg',
+            'doc_id_back_path' => 'funding-documents/back.jpg',
+            'doc_situation_path' => 'funding-documents/situation.pdf',
+            'identity_document_type' => FundingRequest::IDENTITY_DOCUMENT_ID_CARD,
+        ]);
+
+        Storage::disk('local')->put($fundingRequest->doc_id_front_path, 'front');
+        Storage::disk('local')->put($fundingRequest->doc_id_back_path, 'back');
+        Storage::disk('local')->put($fundingRequest->doc_situation_path, 'situation');
+
+        $this->mock(DonationActPdfService::class, function (MockInterface $mock) use ($fundingRequest) {
+            $mock->shouldReceive('generateAndStore')
+                ->once()
+                ->withArgs(function (FundingRequest $request, ?string $locale) use ($fundingRequest) {
+                    return $request->is($fundingRequest) && $locale === 'fr';
+                })
+                ->andReturn('donation-acts/test-act.pdf');
+        });
+
+        Storage::disk('local')->put('donation-acts/test-act.pdf', 'fake pdf');
+
+        $response = $this->actingAs($admin)
+            ->post(route('admin.funding-requests.send-act', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]));
+
+        $fundingRequest->refresh();
+
+        $response->assertSessionHasNoErrors();
+        $this->assertSame(FundingRequest::STATUS_DONATION_ACT_SENT, $fundingRequest->status);
+        $this->assertSame('donation-acts/test-act.pdf', $fundingRequest->donation_act_path);
+
+        Mail::assertSent(FundingDonationActMail::class, function ($mail) use ($fundingRequest) {
+            return $mail->hasTo($fundingRequest->email);
+        });
+
+        Mail::assertSent(FundingDonationActSentAdminMail::class, function ($mail) use ($admin) {
+            return $mail->hasTo($admin->email);
+        });
+    }
+
+    public function test_admin_cannot_refuse_an_already_archived_dossier(): void
+    {
+        Mail::fake();
+
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+
+        $fundingRequest = FundingRequest::factory()->create([
+            'status' => FundingRequest::STATUS_REFUSED,
+            'refused_reason' => 'Motif existant',
+        ]);
+
+        $response = $this->from(route('admin.funding-requests.show', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]))
+            ->actingAs($admin)
+            ->post(route('admin.funding-requests.refuse', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]), [
+                'refused_reason' => 'Nouveau motif',
+            ]);
+
+        $fundingRequest->refresh();
+
+        $response->assertRedirect(route('admin.funding-requests.show', [
+            'locale' => 'fr',
+            'fundingRequest' => $fundingRequest,
+        ]));
+        $response->assertSessionHasErrors('flow');
+        $this->assertSame(FundingRequest::STATUS_REFUSED, $fundingRequest->status);
+        $this->assertSame('Motif existant', $fundingRequest->refused_reason);
+        Mail::assertNothingSent();
+    }
+
+    public function test_admin_cannot_refuse_a_closed_dossier(): void
+    {
+        Mail::fake();
+
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+
+        $fundingRequest = FundingRequest::factory()->create([
+            'status' => FundingRequest::STATUS_CLOSED,
+        ]);
+
+        $response = $this->from(route('admin.funding-requests.show', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]))
+            ->actingAs($admin)
+            ->post(route('admin.funding-requests.refuse', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]), [
+                'refused_reason' => 'Refus tardif',
+            ]);
+
+        $fundingRequest->refresh();
+
+        $response->assertRedirect(route('admin.funding-requests.show', [
+            'locale' => 'fr',
+            'fundingRequest' => $fundingRequest,
+        ]));
+        $response->assertSessionHasErrors('flow');
+        $this->assertSame(FundingRequest::STATUS_CLOSED, $fundingRequest->status);
+        $this->assertNull($fundingRequest->refused_reason);
+        Mail::assertNothingSent();
+    }
+
+    public function test_admin_cannot_reactivate_a_non_archived_dossier(): void
+    {
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+
+        $fundingRequest = FundingRequest::factory()->create([
+            'status' => FundingRequest::STATUS_AWAITING_DOCUMENTS,
+        ]);
+
+        $response = $this->from(route('admin.funding-requests.show', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]))
+            ->actingAs($admin)
+            ->post(route('admin.funding-requests.reactivate', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]));
+
+        $fundingRequest->refresh();
+
+        $response->assertRedirect(route('admin.funding-requests.show', [
+            'locale' => 'fr',
+            'fundingRequest' => $fundingRequest,
+        ]));
+        $response->assertSessionHasErrors('flow');
+        $this->assertSame(FundingRequest::STATUS_AWAITING_DOCUMENTS, $fundingRequest->status);
+    }
+}
