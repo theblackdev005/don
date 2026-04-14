@@ -78,14 +78,18 @@ class SiteSettingsController extends Controller
     {
         $validated = $request->validate([
             'current_password' => ['required', 'string'],
-            'new_password' => ['required', 'string', 'min:6', 'confirmed'],
+            'new_password' => ['required', 'string', 'confirmed'],
+        ], [
+            'current_password.required' => 'Veuillez saisir le code d’accès actuel.',
+            'new_password.required' => 'Veuillez saisir le nouveau code d’accès.',
+            'new_password.confirmed' => 'La confirmation du nouveau code d’accès ne correspond pas.',
         ]);
 
         $adminUser = $request->user();
 
         if (!$adminUser || !Hash::check((string) $validated['current_password'], (string) $adminUser->password)) {
             return back()
-                ->withErrors(['current_password' => 'Le mot de passe actuel est incorrect.'])
+                ->withErrors(['current_password' => 'Le code d’accès actuel est incorrect.'])
                 ->withInput();
         }
 
@@ -93,7 +97,7 @@ class SiteSettingsController extends Controller
             'password' => Hash::make((string) $validated['new_password']),
         ])->save();
 
-        return back()->with('ok', 'Mot de passe modifie avec succes.');
+        return back()->with('ok', 'Code d’accès modifié avec succès.');
     }
 
     private function writeEnvValues(array $updates): void

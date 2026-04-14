@@ -113,7 +113,7 @@ Route::prefix('{locale}')->whereIn('locale', $supportedLocales)->group(function 
                 ->name('funding-requests.close');
             Route::get('configuration', [SiteSettingsController::class, 'edit'])->name('settings.edit');
             Route::post('configuration', [SiteSettingsController::class, 'update'])->name('settings.update');
-            Route::get('configuration/code-acces', [SiteSettingsController::class, 'editPassword'])->name('settings.password.edit');
+            Route::get('configuration/mot-de-passe', [SiteSettingsController::class, 'editPassword'])->name('settings.password.edit');
             Route::post('configuration/mot-de-passe', [SiteSettingsController::class, 'updatePassword'])->name('settings.password.update');
         });
     });

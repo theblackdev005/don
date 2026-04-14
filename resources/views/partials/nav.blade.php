@@ -20,17 +20,7 @@
           <img src="{{ asset('assets/img/branding/humanity-impact.png') }}" alt="{{ config('site.name') }}" style="height: 42px; width: auto;" class="flex-shrink-0">
         </a>
 
-        <div class="form-check form-switch mode-switch order-lg-2 me-3 me-lg-4 ms-auto" data-bs-toggle="mode">
-          <input class="form-check-input" type="checkbox" id="theme-mode">
-          <label class="form-check-label" for="theme-mode">
-            <i class="ai-sun fs-lg"></i>
-          </label>
-          <label class="form-check-label" for="theme-mode">
-            <i class="ai-moon fs-lg"></i>
-          </label>
-        </div>
-
-        <div class="dropdown order-lg-2 me-2 me-lg-3">
+        <div class="dropdown ms-auto order-lg-2 me-2 me-lg-0">
           <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             {{ strtoupper(app()->getLocale()) }}
           </button>
@@ -72,7 +62,7 @@
           </div>
         @endif
 
-        <button class="navbar-toggler ms-sm-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        <button class="navbar-toggler ms-2 ms-sm-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
           aria-label="{{ __('ui.nav.admin_menu') }}">
           <span class="navbar-toggler-icon"></span>
         </button>
