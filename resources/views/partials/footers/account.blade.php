@@ -166,7 +166,7 @@
         <div class="d-sm-flex align-items-center pt-4">
           <div class="d-sm-flex align-items-center pe-sm-2">
             <a class="navbar-brand d-inline-flex align-items-center me-sm-5 mb-4 mb-sm-0" href="{{ url('/') }}">
-              <img src="{{ asset('assets/img/branding/humanity-impact.png') }}" alt="{{ config('site.name') }}" style="height: 42px; width: auto;" class="flex-shrink-0 me-2">
+              <img src="{{ \App\Support\SiteAppearance::logoUrl() }}" alt="{{ config('site.name') }}" style="height: 42px; width: auto;" class="flex-shrink-0 me-2">
               <span class="text-light opacity-90">{{ config('site.name') }}</span>
             </a>
             <div class="d-flex mb-4 mb-sm-0">

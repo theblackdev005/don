@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', config('site.name').' | '.__('pages.tracking.title'))
+@section('title', __('pages.tracking.title'))
 
 @push('meta')
   @include('partials.meta-default')
@@ -45,7 +45,7 @@
               <p class="text-body-secondary mb-0">{{ $summary['body'] }}</p>
               @if ($trackingResult->applicantCanDownloadDonationAct())
                 <div class="mt-4">
-                  <a class="btn btn-success btn-lg" href="{{ route('funding-request.download-act', ['locale' => $pageLocale, 'public_slug' => $trackingResult->public_slug]) }}">{{ __('pages.tracking.download_donation_act') }}</a>
+                  <a class="btn btn-success btn-lg" href="{{ \App\Support\LocalizedRouteSlugs::route('funding-request.download-act', ['locale' => $pageLocale, 'public_slug' => $trackingResult->public_slug]) }}">{{ __('pages.tracking.download_donation_act') }}</a>
                   <p class="small text-body-secondary mt-2 mb-0">{{ __('pages.tracking.download_donation_act_help') }}</p>
                 </div>
               @endif
@@ -54,16 +54,16 @@
           </div>
           <div class="text-center">
             @if ($trackingResult->applicantCanDownloadDonationAct())
-              <a class="btn btn-success me-2 mb-2" href="{{ route('funding-request.download-act', ['locale' => $pageLocale, 'public_slug' => $trackingResult->public_slug]) }}">{{ __('pages.tracking.download_donation_act') }}</a>
+              <a class="btn btn-success me-2 mb-2" href="{{ \App\Support\LocalizedRouteSlugs::route('funding-request.download-act', ['locale' => $pageLocale, 'public_slug' => $trackingResult->public_slug]) }}">{{ __('pages.tracking.download_donation_act') }}</a>
             @endif
-            <a class="btn btn-outline-primary me-2 mb-2" href="{{ route('funding.tracking', ['locale' => $pageLocale]) }}">{{ __('pages.tracking.check_other') }}</a>
+            <a class="btn btn-outline-primary me-2 mb-2" href="{{ \App\Support\LocalizedRouteSlugs::route('funding.tracking', ['locale' => $pageLocale]) }}">{{ __('pages.tracking.check_other') }}</a>
             @php
               $trackingContactEmail = trim((string) config('site.email', ''));
             @endphp
             @if ($trackingContactEmail !== '')
               <a class="btn btn-primary mb-2" href="mailto:{{ e($trackingContactEmail) }}">{{ __('pages.tracking.contact') }}</a>
             @else
-              <a class="btn btn-primary mb-2" href="{{ route('contact', ['locale' => $pageLocale]) }}">{{ __('pages.tracking.contact') }}</a>
+              <a class="btn btn-primary mb-2" href="{{ \App\Support\LocalizedRouteSlugs::route('contact', ['locale' => $pageLocale]) }}">{{ __('pages.tracking.contact') }}</a>
             @endif
           </div>
         @else
@@ -90,7 +90,7 @@
             <div class="card-body p-4 p-md-5">
               <h2 class="h5 mb-3"><span class="badge bg-primary me-2">2</span> {{ __('pages.tracking.step2') }}</h2>
               <p class="text-body-secondary small mb-3">{{ __('pages.tracking.number_example') }} <kbd class="user-select-all">ARD-2026-A7K9Q2</kbd></p>
-              <form method="post" action="{{ route('funding.tracking.lookup', ['locale' => $pageLocale]) }}" class="needs-validation" novalidate>
+              <form method="post" action="{{ \App\Support\LocalizedRouteSlugs::route('funding.tracking.lookup', ['locale' => $pageLocale]) }}" class="needs-validation" novalidate>
                 @csrf
                 <div class="mb-4">
                   <label class="form-label fw-semibold" for="dossier_number">{{ __('pages.tracking.number_label') }}</label>
@@ -99,7 +99,7 @@
                 </div>
                 <div class="d-flex flex-wrap gap-2 justify-content-between">
                   <button type="button" class="btn btn-outline-secondary" id="tracking-back-step-1">{{ __('pages.tracking.back') }}</button>
-                  <button type="submit" class="btn btn-primary btn-lg">{{ __('pages.tracking.submit') }}</button>
+                  <button type="submit" class="btn btn-primary btn-lg" data-submit-loading-text="{{ __('ui.common.processing') }}">{{ __('pages.tracking.submit') }}</button>
                 </div>
               </form>
             </div>
@@ -110,7 +110,7 @@
     </div>
   </section>
 </main>
-@include('partials.footers.compact')
+@include('partials.footers.marketing')
 
 @unless ($trackingResult)
 @push('vendor-scripts')

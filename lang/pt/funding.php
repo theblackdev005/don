@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array_replace_recursive(require __DIR__.'/../en/funding.php', [
     'meta_title' => 'Pedido de ajuda financeira',
     'breadcrumb_current' => 'Pedido de ajuda financeira',
     'heading' => 'Pedido de ajuda financeira',
@@ -133,4 +133,4 @@ return [
             'body' => 'O seu processo está registado. Para mais informações utilize os dados recebidos por e-mail.',
         ],
     ],
-];
+]);

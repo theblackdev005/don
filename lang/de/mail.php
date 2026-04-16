@@ -1,8 +1,13 @@
 <?php
 
-return [
+return array_replace_recursive(require __DIR__.'/../en/mail.php', [
     'layout' => [
-        'default_signoff' => 'Mit freundlichen Grüßen,<br><strong>:site</strong>',
+        'default_signoff' => 'Mit freundlichen Grüßen,',
+        'brand_fallback' => 'Offizielle Benachrichtigung',
+        'notification_label' => 'Automatische Nachricht',
+        'contact_email_label' => 'E-Mail: ',
+        'contact_whatsapp_label' => 'WhatsApp: ',
+        'copyright' => 'Alle Rechte vorbehalten.',
     ],
     'common' => [
         'greeting_neutral' => 'Guten Tag,',
@@ -86,4 +91,14 @@ return [
         'p2' => 'Der Vorgang ist bereit für die Endprüfung und den Versand der Schenkungsurkunde.',
         'cta' => 'Vorgang öffnen',
     ],
-];
+    'closed' => [
+        'subject' => 'Endgültige Bestätigung Ihres Antrags — :number',
+        'meta_title' => 'Vorgang abgeschlossen',
+        'greeting' => 'Guten Tag :name,',
+        'amount_label' => 'Genehmigter Betrag:',
+        'p1' => 'Ihr Finanzierungsantrag <strong>:number</strong> wurde erfolgreich bearbeitet.',
+        'p2' => 'Der Betrag von <strong>:amount</strong> wurde genehmigt, und alles ist nun für die Überweisung der Mittel vorbereitet.',
+        'p3' => 'Bitte wenden Sie sich für den nächsten Schritt an den zuständigen Sachbearbeiter oder an die Finanzierungsleitung, um die Mittel zu erhalten.',
+        'regards' => 'Mit freundlichen Grüßen,',
+    ],
+]);

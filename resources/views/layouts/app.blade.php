@@ -6,12 +6,12 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
 
-  <title>@yield('title', config('site.name'))</title>
+  <title>{{ config('site.name') }} | {{ __('funding.meta_title') }}</title>
   @stack('meta')
 
   <link rel="manifest" href="/manifest.json">
-  <link rel="icon" type="image/png" href="/assets/app-icons/icon-32x32.png" sizes="32x32">
-  <link rel="apple-touch-icon" href="/assets/app-icons/icon-180x180.png">
+  <link rel="icon" href="{{ \App\Support\SiteAppearance::faviconUrl() }}">
+  <link rel="apple-touch-icon" href="{{ \App\Support\SiteAppearance::faviconUrl() }}">
 
   <script src="/assets/js/theme-switcher.js"></script>
 
@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="/assets/icons/around-icons.min.css">
   <link rel="stylesheet" media="screen" href="/assets/css/theme.min.css">
 
+  @include('partials.site-tracking-head')
   @include('partials.preloader-head')
   @stack('head')
 </head>
@@ -39,6 +40,46 @@
 
   @stack('vendor-scripts')
   <script src="/assets/js/theme.min.js"></script>
+  <script>
+    (() => {
+      const initSubmitLoadingStates = () => {
+        document.querySelectorAll('form').forEach((form) => {
+          form.addEventListener('submit', () => {
+            const submitButton = form.querySelector('button[type="submit"], input[type="submit"]');
+            if (!submitButton || submitButton.disabled) {
+              return;
+            }
+
+            const loadingText = submitButton.getAttribute('data-submit-loading-text');
+            if (!loadingText) {
+              return;
+            }
+
+            if (!submitButton.dataset.originalText) {
+              submitButton.dataset.originalText = submitButton.tagName === 'INPUT'
+                ? (submitButton.value || '')
+                : (submitButton.innerHTML || '');
+            }
+
+            if (submitButton.tagName === 'INPUT') {
+              submitButton.value = loadingText;
+            } else {
+              submitButton.textContent = loadingText;
+            }
+
+            submitButton.disabled = true;
+            submitButton.setAttribute('aria-busy', 'true');
+          });
+        });
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSubmitLoadingStates, { once: true });
+      } else {
+        initSubmitLoadingStates();
+      }
+    })();
+  </script>
 </body>
 
 </html>

@@ -3,7 +3,12 @@
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\FundingRequestAdminController;
 use App\Http\Controllers\Admin\SiteSettingsController;
+use App\Http\Controllers\Admin\SmtpSettingsController;
+use App\Http\Controllers\Admin\TestimonialAdminController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FundingRequestController;
+use App\Models\Testimonial;
+use App\Support\LocalizedRouteSlugs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,7 +18,6 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-$slug = fn (string $key) => trim((string) config("site.slugs.{$key}"), '/');
 $supportedLocales = config('locales.supported', ['fr']);
 $localePattern = implode('|', $supportedLocales);
 
@@ -34,46 +38,116 @@ Route::get('/{locale}/lang/{target}', function (Request $request, string $locale
 
     $previous = url()->previous();
     $path = parse_url($previous, PHP_URL_PATH) ?: '/';
-    $path = preg_replace('#^/('.$localePattern.')(?=/|$)#', '', $path);
-    $path = $path ?: '/';
+
+    try {
+        $matchedRoute = app('router')->getRoutes()->match(Request::create($path, 'GET'));
+        $routeName = $matchedRoute->getName();
+        $routeParameters = array_intersect_key($matchedRoute->parameters(), array_flip($matchedRoute->parameterNames()));
+
+        if ($routeName) {
+            $parameters = LocalizedRouteSlugs::applyLocalizedParameters(
+                $routeName,
+                $routeParameters,
+                $target
+            );
+            $parameters['locale'] = $target;
+
+            return redirect(route($routeName, $parameters));
+        }
+    } catch (\Throwable) {
+        // Fallback below keeps locale switching functional even if previous URL is not a named route.
+    }
+
+    $path = preg_replace('#^/('.$localePattern.')(?=/|$)#', '', $path) ?: '/';
 
     return redirect('/'.$target.$path);
 })->whereIn('locale', $supportedLocales)->whereIn('target', $supportedLocales)->name('locale.switch');
 
-Route::prefix('{locale}')->whereIn('locale', $supportedLocales)->group(function () use ($slug) {
-    Route::view('/', 'pages.home')->name('home');
-    Route::view('/'.$slug('about'), 'pages.about')->name('about');
-    Route::view('/'.$slug('services'), 'pages.services')->name('services');
-    Route::view('/'.$slug('contact'), 'pages.contact')->name('contact');
-    Route::view('/'.$slug('legal'), 'pages.legal')->name('legal');
-    Route::view('/'.$slug('privacy'), 'pages.privacy')->name('privacy');
-    Route::view('/'.$slug('account'), 'pages.account')->name('account');
+Route::prefix('{locale}')->whereIn('locale', $supportedLocales)->group(function () {
+    $slugParam = fn (string $key) => '{'.LocalizedRouteSlugs::parameterName($key).'}';
+    $slugPattern = fn (string $key) => LocalizedRouteSlugs::pattern($key);
 
-    $fundingBase = $slug('funding_request');
-    $fundingConfirm = $slug('funding_request_confirmation');
+    Route::get('/', function () {
+        return view('pages.home', [
+            'testimonials' => Testimonial::query()->with('translations')->active()->ordered()->get(),
+        ]);
+    })->name('home');
+    Route::view('/'.$slugParam('about'), 'pages.about')
+        ->where(LocalizedRouteSlugs::parameterName('about'), $slugPattern('about'))
+        ->name('about');
+    Route::view('/'.$slugParam('services'), 'pages.services')
+        ->where(LocalizedRouteSlugs::parameterName('services'), $slugPattern('services'))
+        ->name('services');
+    Route::get('/'.$slugParam('contact'), [ContactController::class, 'show'])
+        ->where(LocalizedRouteSlugs::parameterName('contact'), $slugPattern('contact'))
+        ->name('contact');
+    Route::post('/'.$slugParam('contact'), [ContactController::class, 'submit'])
+        ->where(LocalizedRouteSlugs::parameterName('contact'), $slugPattern('contact'))
+        ->middleware('throttle:4,1')
+        ->name('contact.submit');
+    Route::view('/'.$slugParam('legal'), 'pages.legal')
+        ->where(LocalizedRouteSlugs::parameterName('legal'), $slugPattern('legal'))
+        ->name('legal');
+    Route::view('/'.$slugParam('privacy'), 'pages.privacy')
+        ->where(LocalizedRouteSlugs::parameterName('privacy'), $slugPattern('privacy'))
+        ->name('privacy');
+    Route::view('/'.$slugParam('account'), 'pages.account')
+        ->where(LocalizedRouteSlugs::parameterName('account'), $slugPattern('account'))
+        ->name('account');
 
-    Route::get('/'.$fundingBase, [FundingRequestController::class, 'create'])->name('funding-request.create');
-    Route::post('/'.$fundingBase, [FundingRequestController::class, 'store'])->name('funding-request.store');
-    Route::get('/'.$fundingBase.'/'.$fundingConfirm.'/{public_slug}/documents', [FundingRequestController::class, 'documentsForm'])
+    $fundingBase = $slugParam('funding_request');
+    $fundingConfirm = $slugParam('funding_request_confirmation');
+
+    Route::get('/'.$fundingBase, [FundingRequestController::class, 'create'])
+        ->where(LocalizedRouteSlugs::parameterName('funding_request'), $slugPattern('funding_request'))
+        ->name('funding-request.create');
+    Route::post('/'.$fundingBase, [FundingRequestController::class, 'store'])
+        ->where(LocalizedRouteSlugs::parameterName('funding_request'), $slugPattern('funding_request'))
+        ->name('funding-request.store');
+    Route::get('/'.$fundingBase.'/{public_slug}/documents', [FundingRequestController::class, 'documentsForm'])
+        ->where(LocalizedRouteSlugs::parameterName('funding_request'), $slugPattern('funding_request'))
         ->where('public_slug', '[a-z0-9]{12}')
         ->name('funding-request.documents');
-    Route::post('/'.$fundingBase.'/'.$fundingConfirm.'/{public_slug}/documents', [FundingRequestController::class, 'documentsStore'])
+    Route::post('/'.$fundingBase.'/{public_slug}/documents', [FundingRequestController::class, 'documentsStore'])
+        ->where(LocalizedRouteSlugs::parameterName('funding_request'), $slugPattern('funding_request'))
         ->where('public_slug', '[a-z0-9]{12}')
         ->name('funding-request.documents.store');
+    Route::get('/'.$fundingBase.'/'.$fundingConfirm.'/{public_slug}/documents', [FundingRequestController::class, 'documentsForm'])
+        ->where(LocalizedRouteSlugs::parameterName('funding_request'), $slugPattern('funding_request'))
+        ->where(LocalizedRouteSlugs::parameterName('funding_request_confirmation'), $slugPattern('funding_request_confirmation'))
+        ->where('public_slug', '[a-z0-9]{12}')
+        ->name('funding-request.documents.legacy');
+    Route::post('/'.$fundingBase.'/'.$fundingConfirm.'/{public_slug}/documents', [FundingRequestController::class, 'documentsStore'])
+        ->where(LocalizedRouteSlugs::parameterName('funding_request'), $slugPattern('funding_request'))
+        ->where(LocalizedRouteSlugs::parameterName('funding_request_confirmation'), $slugPattern('funding_request_confirmation'))
+        ->where('public_slug', '[a-z0-9]{12}')
+        ->name('funding-request.documents.store.legacy');
     Route::get('/'.$fundingBase.'/'.$fundingConfirm.'/{public_slug}/acte.pdf', [FundingRequestController::class, 'downloadDonationActApplicant'])
+        ->where(LocalizedRouteSlugs::parameterName('funding_request'), $slugPattern('funding_request'))
+        ->where(LocalizedRouteSlugs::parameterName('funding_request_confirmation'), $slugPattern('funding_request_confirmation'))
         ->where('public_slug', '[a-z0-9]{12}')
         ->name('funding-request.download-act');
     Route::get('/'.$fundingBase.'/'.$fundingConfirm.'/{public_slug?}', [FundingRequestController::class, 'success'])
+        ->where(LocalizedRouteSlugs::parameterName('funding_request'), $slugPattern('funding_request'))
+        ->where(LocalizedRouteSlugs::parameterName('funding_request_confirmation'), $slugPattern('funding_request_confirmation'))
         ->where('public_slug', '[a-z0-9]{12}')
         ->name('funding-request.success');
 
-    $trackingSlug = $slug('dossier_tracking');
-    Route::get('/'.$trackingSlug, [FundingRequestController::class, 'trackingForm'])->name('funding.tracking');
-    Route::post('/'.$trackingSlug, [FundingRequestController::class, 'trackingLookup'])->name('funding.tracking.lookup');
+    $trackingSlug = $slugParam('dossier_tracking');
+    Route::get('/'.$trackingSlug, [FundingRequestController::class, 'trackingForm'])
+        ->where(LocalizedRouteSlugs::parameterName('dossier_tracking'), $slugPattern('dossier_tracking'))
+        ->name('funding.tracking');
+    Route::post('/'.$trackingSlug, [FundingRequestController::class, 'trackingLookup'])
+        ->where(LocalizedRouteSlugs::parameterName('dossier_tracking'), $slugPattern('dossier_tracking'))
+        ->name('funding.tracking.lookup');
 
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('connexion', [AdminAuthController::class, 'showLogin'])->name('login');
         Route::post('connexion', [AdminAuthController::class, 'login']);
+        Route::get('mot-de-passe-oublie', [AdminAuthController::class, 'showForgotPassword'])->name('password.request');
+        Route::post('mot-de-passe-oublie', [AdminAuthController::class, 'sendResetLink'])->name('password.email');
+        Route::get('reinitialiser-mot-de-passe/{token}', [AdminAuthController::class, 'showResetPassword'])->name('password.reset');
+        Route::post('reinitialiser-mot-de-passe', [AdminAuthController::class, 'resetPassword'])->name('password.update');
         Route::post('deconnexion', [AdminAuthController::class, 'logout'])->name('logout');
 
         Route::middleware(['auth', 'admin'])->group(function () {
@@ -113,8 +187,16 @@ Route::prefix('{locale}')->whereIn('locale', $supportedLocales)->group(function 
                 ->name('funding-requests.close');
             Route::get('configuration', [SiteSettingsController::class, 'edit'])->name('settings.edit');
             Route::post('configuration', [SiteSettingsController::class, 'update'])->name('settings.update');
+            Route::get('configuration/apercu-acte', [SiteSettingsController::class, 'previewDonationAct'])->name('settings.preview-donation-act');
             Route::get('configuration/mot-de-passe', [SiteSettingsController::class, 'editPassword'])->name('settings.password.edit');
             Route::post('configuration/mot-de-passe', [SiteSettingsController::class, 'updatePassword'])->name('settings.password.update');
+            Route::get('smtp', [SmtpSettingsController::class, 'edit'])->name('smtp.edit');
+            Route::post('smtp', [SmtpSettingsController::class, 'update'])->name('smtp.update');
+            Route::post('smtp/test', [SmtpSettingsController::class, 'sendTest'])->name('smtp.test');
+            Route::get('temoignages', [TestimonialAdminController::class, 'index'])->name('testimonials.index');
+            Route::post('temoignages', [TestimonialAdminController::class, 'store'])->name('testimonials.store');
+            Route::put('temoignages/{testimonial}', [TestimonialAdminController::class, 'update'])->name('testimonials.update');
+            Route::delete('temoignages/{testimonial}', [TestimonialAdminController::class, 'destroy'])->name('testimonials.destroy');
         });
     });
 });

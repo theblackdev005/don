@@ -1,10 +1,9 @@
 @extends('layouts.app')
 
-@section('title', config('site.name').' | '.__('pages.legal.title'))
+@section('title', __('pages.legal.title'))
 
 @push('meta')
-  <meta name="description" content="{{ __('pages.legal.meta_description') }}">
-  <meta name="keywords" content="{{ config('site.meta.keywords') }}">
+  @include('partials.meta-default')
 @endpush
 
 @section('content')
@@ -37,5 +36,5 @@
     </div>
   </section>
 </main>
-@include('partials.footers.compact')
+@include('partials.footers.marketing')
 @endsection

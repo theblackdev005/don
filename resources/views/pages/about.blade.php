@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', config('site.name').' | '.__('about.meta_title'))
+@section('title', __('about.meta_title'))
 
 @push('meta')
   @include('partials.meta-default')
@@ -320,7 +320,7 @@
       </div>
     </section>
 
-  @include('partials.footers.about')
+  @include('partials.footers.marketing')
 </main>
 
 @push('vendor-scripts')

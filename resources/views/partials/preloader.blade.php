@@ -2,6 +2,6 @@
   <div class="page-loading active">
     <div class="page-loading-inner">
       <div class="page-spinner"></div>
-      <span>Chargement…</span>
+      <span>{{ __('ui.common.loading') }}</span>
     </div>
   </div>

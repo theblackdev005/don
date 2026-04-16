@@ -9,6 +9,7 @@ return [
     'progress_aria' => 'Progression du formulaire',
     'steps_aria' => 'Étapes du formulaire',
     'step_label' => 'Étape :current sur :total',
+    'step_badge' => 'Étape :number',
     'step1_title' => '1. Informations personnelles',
     'step2_title' => '2. Votre situation',
     'step3_title' => '3. Votre demande',

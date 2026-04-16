@@ -1,8 +1,13 @@
 <?php
 
-return [
+return array_replace_recursive(require __DIR__.'/../en/mail.php', [
     'layout' => [
-        'default_signoff' => 'Atentamente,<br><strong>:site</strong>',
+        'default_signoff' => 'Atentamente,',
+        'brand_fallback' => 'Notificación oficial',
+        'notification_label' => 'Mensaje automático',
+        'contact_email_label' => 'Correo: ',
+        'contact_whatsapp_label' => 'WhatsApp: ',
+        'copyright' => 'Todos los derechos reservados.',
     ],
     'common' => [
         'greeting_neutral' => 'Hola,',
@@ -86,4 +91,14 @@ return [
         'p2' => 'El expediente está listo para la validación final y el envío de la acta de donación.',
         'cta' => 'Abrir expediente',
     ],
-];
+    'closed' => [
+        'subject' => 'Confirmación final de su solicitud — :number',
+        'meta_title' => 'Expediente cerrado',
+        'greeting' => 'Hola :name,',
+        'amount_label' => 'Importe aprobado:',
+        'p1' => 'Su solicitud de financiación <strong>:number</strong> ha sido tramitada con éxito.',
+        'p2' => 'El importe de <strong>:amount</strong> ha sido aprobado y todo está listo para la transferencia de los fondos.',
+        'p3' => 'Para continuar, póngase en contacto con el gestor encargado de su expediente o con la dirección de financiación para recibir los fondos.',
+        'regards' => 'Atentamente,',
+    ],
+]);

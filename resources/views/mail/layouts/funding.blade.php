@@ -1,7 +1,11 @@
 @php
   $siteName = (string) config('site.name', config('app.name', 'Around'));
-  $siteEmail = (string) config('site.email', '');
-  $brand = '#0f6b57';
+  $siteEmail = trim((string) config('site.public_contact_email', config('site.email', '')));
+  $siteWhatsApp = trim((string) config('site.whatsapp', ''));
+  $siteWhatsAppHref = $siteWhatsApp !== '' ? 'https://wa.me/'.preg_replace('/\D+/', '', $siteWhatsApp) : null;
+  $brand = \App\Support\SiteAppearance::primaryColor();
+  $brandRgb = \App\Support\SiteAppearance::primaryRgb();
+  $brandText = \App\Support\SiteAppearance::contrastTextColor($brand);
   $text = '#1a1a1a';
   $muted = '#5c6670';
   $surface = '#ffffff';
@@ -11,14 +15,15 @@
   $styleBody = "margin:0;padding:0;background-color:{$pageBg};-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;";
   $styleTableOuter = "background-color:{$pageBg};margin:0;padding:0;";
   $styleHeaderTd = "background-color:{$brand};border-radius:12px 12px 0 0;padding:22px 28px;";
-  $styleCardOuter = "background-color:{$surface};padding:0 1px 1px;border-radius:0 0 12px 12px;box-shadow:0 4px 24px rgba(15,107,87,0.08);";
+  $styleCardOuter = "background-color:{$surface};padding:0 1px 1px;border-radius:0 0 12px 12px;box-shadow:0 4px 24px rgba({$brandRgb},0.08);";
   $styleContentTd = "padding:28px 28px 8px;font-family:{$ff};font-size:16px;line-height:1.55;color:{$text};";
   $styleSecondaryTd = "padding:0 28px 24px;font-family:{$ff};font-size:14px;line-height:1.5;color:{$muted};";
   $styleSignoffWrapTd = "padding:0 28px 28px;font-family:{$ff};font-size:15px;line-height:1.5;color:{$text};";
   $styleSignoffP = "margin:20px 0 0;padding-top:20px;border-top:1px solid #e5ebe9;font-size:14px;color:{$muted};";
   $styleFooterTd = "padding:20px 8px 0;text-align:center;font-family:{$ff};font-size:12px;line-height:1.6;color:{$muted};";
   $styleMailtoA = "color:{$brand};text-decoration:none;font-weight:600;";
-  $styleHeaderTagline = "margin:6px 0 0;font-family:{$ff};font-size:13px;color:rgba(255,255,255,0.88);line-height:1.4;";
+  $headerTaglineColor = $brandText === '#ffffff' ? 'rgba(255,255,255,0.88)' : 'rgba(23,32,51,0.78)';
+  $styleHeaderTagline = "margin:6px 0 0;font-family:{$ff};font-size:13px;color:{$headerTaglineColor};line-height:1.4;";
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -47,7 +52,7 @@
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px;margin:0 auto;">
           <tr>
             <td style="@php echo e($styleHeaderTd); @endphp">
-              <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:700;letter-spacing:0.02em;color:#ffffff;line-height:1.25;">
+              <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:700;letter-spacing:0.02em;color:{{ $brandText }};line-height:1.25;">
                 {{ $siteName }}
               </p>
               @hasSection('header_tagline')
@@ -86,11 +91,16 @@
             <td style="@php echo e($styleFooterTd); @endphp">
               @if($siteEmail !== '')
               <p style="margin:0 0 6px;">
-                <a href="mailto:{{ $siteEmail }}" style="@php echo e($styleMailtoA); @endphp">{{ $siteEmail }}</a>
+                <strong>{{ __('mail.layout.contact_email_label') }}</strong><a href="mailto:{{ $siteEmail }}" style="@php echo e($styleMailtoA); @endphp">{{ $siteEmail }}</a>
+              </p>
+              @endif
+              @if($siteWhatsApp !== '' && $siteWhatsAppHref)
+              <p style="margin:0 0 6px;">
+                <strong>{{ __('mail.layout.contact_whatsapp_label') }}</strong><a href="{{ $siteWhatsAppHref }}" style="@php echo e($styleMailtoA); @endphp">{{ $siteWhatsApp }}</a>
               </p>
               @endif
               <p style="margin:0;opacity:0.85;">
-                © {{ date('Y') }} {{ $siteName }}
+                © {{ date('Y') }} {{ $siteName }}. {{ __('mail.layout.copyright') }}
               </p>
             </td>
           </tr>

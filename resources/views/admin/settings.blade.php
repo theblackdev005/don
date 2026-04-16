@@ -24,6 +24,35 @@
       line-height: 1.65;
     }
 
+    .admin-logo-preview {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 132px;
+      padding: 1.25rem;
+      border: 1px dashed rgba(15, 23, 42, 0.14);
+      border-radius: 1rem;
+      background:
+        linear-gradient(135deg, rgba(var(--bs-primary-rgb), 0.04), rgba(255, 180, 0, 0.08));
+    }
+
+    .admin-logo-preview img {
+      max-width: 100%;
+      max-height: 82px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .admin-favicon-preview img {
+      max-width: 52px;
+      max-height: 52px;
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      border-radius: .85rem;
+    }
+
     [data-bs-theme="dark"] .admin-settings-card {
       background: #20262d;
       border-color: rgba(255, 255, 255, 0.08);
@@ -39,7 +68,11 @@
 
 @if ($errors->any())
   <div class="alert alert-danger mb-4">
-    <ul class="mb-0 ps-3">@foreach ($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+    <ul class="mb-0 ps-3">
+      @foreach ($errors->all() as $e)
+        <li>{{ $e }}</li>
+      @endforeach
+    </ul>
   </div>
 @endif
 
@@ -48,9 +81,13 @@
     <h1 class="h2 mb-1">Configuration</h1>
     <p class="text-body-secondary mb-0">Mettez à jour les informations visibles sur la plateforme.</p>
   </div>
+  <a href="{{ route('admin.settings.preview-donation-act') }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary">
+    <i class="ai-file-text me-2"></i>
+    Prévisualiser le contrat
+  </a>
 </div>
 
-<form method="post" action="{{ route('admin.settings.update') }}">
+<form method="post" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data">
   @csrf
   <div class="row g-4">
     <div class="col-xl-7">
@@ -71,17 +108,75 @@
               @endforeach
             </select>
           </div>
+          <div class="col-12">
+            <label class="form-label">Logo du site</label>
+            <div class="admin-logo-preview mb-3">
+              <img src="{{ $settings['site_logo_url'] }}" alt="{{ $settings['site_name'] }}">
+            </div>
+            <input type="file" name="site_logo" class="form-control" accept=".png,.jpg,.jpeg,.webp">
+            <div class="form-text">PNG ou JPG recommande pour un rendu plus fiable sur le site et dans les e-mails.</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Favicon</label>
+            <div class="admin-logo-preview admin-favicon-preview mb-3">
+              <img src="{{ $settings['site_favicon_url'] }}" alt="Favicon {{ $settings['site_name'] }}">
+            </div>
+            <input type="file" name="site_favicon" class="form-control" accept=".png,.ico,.webp">
+            <div class="form-text">Le favicon est l’icône visible dans l’onglet du navigateur.</div>
+          </div>
+          <div class="col-md-6 d-flex align-items-end">
+            <div class="admin-settings-helper w-100">
+              Le logo et le favicon sont publiés automatiquement sur le projet dès que vous enregistrez la configuration.
+            </div>
+          </div>
           <div class="col-md-6">
             <label class="form-label">E-mail du site</label>
             <input type="email" name="site_email" class="form-control" value="{{ old('site_email', $settings['site_email']) }}">
+            <div class="form-text">Cet e-mail est aussi utilisé comme e-mail public du site et dans le footer.</div>
           </div>
           <div class="col-md-6">
             <label class="form-label">Téléphone</label>
             <input type="text" name="site_phone" class="form-control" value="{{ old('site_phone', $settings['site_phone']) }}">
+            <div class="form-text">Ce numéro est aussi réutilisé comme numéro WhatsApp du site.</div>
           </div>
           <div class="col-12">
             <label class="form-label">Adresse du site</label>
             <input type="text" name="site_address" class="form-control" value="{{ old('site_address', $settings['site_address']) }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Nom complet légal</label>
+            <input type="text" name="site_legal_full_name" class="form-control" value="{{ old('site_legal_full_name', $settings['site_legal_full_name']) }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Numéro d’entreprise</label>
+            <input type="text" name="site_company_number" class="form-control" value="{{ old('site_company_number', $settings['site_company_number']) }}">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Adresse principale</label>
+            <input type="text" name="site_main_address" class="form-control" value="{{ old('site_main_address', $settings['site_main_address']) }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Facebook</label>
+            <input type="url" name="site_social_facebook" class="form-control" value="{{ old('site_social_facebook', $settings['site_social_facebook']) }}" placeholder="https://facebook.com/...">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Instagram</label>
+            <input type="url" name="site_social_instagram" class="form-control" value="{{ old('site_social_instagram', $settings['site_social_instagram']) }}" placeholder="https://instagram.com/...">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">LinkedIn</label>
+            <input type="url" name="site_social_linkedin" class="form-control" value="{{ old('site_social_linkedin', $settings['site_social_linkedin']) }}" placeholder="https://linkedin.com/company/...">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Nom du représentant</label>
+            <input type="text" name="donation_act_director_name" class="form-control" value="{{ old('donation_act_director_name', $settings['donation_act_director_name']) }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Sexe du représentant</label>
+            <select name="donation_act_director_gender" class="form-select">
+              <option value="female" @selected(old('donation_act_director_gender', $settings['donation_act_director_gender']) === 'female')>Femme</option>
+              <option value="male" @selected(old('donation_act_director_gender', $settings['donation_act_director_gender']) === 'male')>Homme</option>
+            </select>
           </div>
         </div>
       </div>
@@ -89,13 +184,15 @@
       <div class="admin-settings-card p-4">
         <div class="admin-settings-section-title">Référencement</div>
         <div class="row g-3">
-          <div class="col-12">
-            <label class="form-label">Description du site</label>
-            <input type="text" name="site_meta_description" class="form-control" value="{{ old('site_meta_description', $settings['site_meta_description']) }}">
+          <div class="col-md-6">
+            <label class="form-label">Google Tag ID</label>
+            <input type="text" name="site_google_tag_id" class="form-control" value="{{ old('site_google_tag_id', $settings['site_google_tag_id']) }}" placeholder="G-XXXXXXXXXX">
+            <div class="form-text">Ajoutez uniquement l’identifiant, pas tout le script Google.</div>
           </div>
-          <div class="col-12">
-            <label class="form-label">Mots-clés</label>
-            <input type="text" name="site_meta_keywords" class="form-control" value="{{ old('site_meta_keywords', $settings['site_meta_keywords']) }}">
+          <div class="col-md-6">
+            <label class="form-label">Facebook Pixel ID</label>
+            <input type="text" name="site_facebook_pixel_id" class="form-control" value="{{ old('site_facebook_pixel_id', $settings['site_facebook_pixel_id']) }}" placeholder="123456789012345">
+            <div class="form-text">Ajoutez uniquement l’identifiant du pixel Facebook.</div>
           </div>
         </div>
       </div>
@@ -105,7 +202,7 @@
     <div class="col-xl-5">
       <div class="admin-settings-card p-4 mb-4">
         <div class="admin-settings-section-title">À propos</div>
-        <p class="text-body-secondary mb-0">Cette page permet de gérer les informations générales affichées sur le site.</p>
+        <p class="text-body-secondary mb-0">Cette page permet de gérer l’identité du site, ses couleurs, son logo, son favicon, son référencement et les informations publiques affichées sur la plateforme et dans les e-mails.</p>
       </div>
 
       <div class="admin-settings-card p-4">

@@ -7,6 +7,7 @@ use App\Mail\FundingRequestReceivedAdminMail;
 use App\Mail\FundingRequestReceivedApplicantMail;
 use App\Models\FundingRequest;
 use App\Models\User;
+use App\Support\LocalizedRouteSlugs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -102,19 +103,27 @@ class FundingRequestController extends Controller
 
         $adminEmail = $this->resolveAdminNotificationEmail();
         if ($adminEmail) {
-            $adminLocale = config('locales.default', 'fr');
             Mail::to($adminEmail)->send(
-                (new FundingRequestReceivedAdminMail($funding))->locale($adminLocale)
+                (new FundingRequestReceivedAdminMail($funding))->locale('fr')
             );
         }
 
-        return redirect()
-            ->route('funding-request.success', ['public_slug' => $funding->public_slug])
+        return redirect(
+            LocalizedRouteSlugs::route('funding-request.success', [
+                'locale' => $locale,
+                'public_slug' => $funding->public_slug,
+            ])
+        )
             ->with('dossier_number', $funding->dossier_number);
     }
 
     public function success(string $locale, Request $request, ?string $public_slug = null)
     {
+        $public_slug = (string) $request->route('public_slug', $public_slug ?? '');
+        if ($public_slug === '') {
+            $public_slug = null;
+        }
+
         $context = (string) ($request->query('context') ?? 'funding');
         if (! in_array($context, ['funding', 'documents'], true)) {
             $context = 'funding';
@@ -130,9 +139,9 @@ class FundingRequestController extends Controller
             if ($fr) {
                 $dossier_number = $fr->dossier_number;
                 $applicant_name = $fr->full_name;
-                $tracking_url = route('funding-request.success', ['locale' => $locale, 'public_slug' => $fr->public_slug]);
+                $tracking_url = LocalizedRouteSlugs::route('funding-request.success', ['locale' => $locale, 'public_slug' => $fr->public_slug]);
                 if ($fr->applicantCanUploadDocuments()) {
-                    $documents_url = route('funding-request.documents', ['locale' => $locale, 'public_slug' => $fr->public_slug]);
+                    $documents_url = LocalizedRouteSlugs::route('funding-request.documents', ['locale' => $locale, 'public_slug' => $fr->public_slug]);
                 }
             }
         }
@@ -143,9 +152,9 @@ class FundingRequestController extends Controller
                 $fr = FundingRequest::query()->where('dossier_number', $dossier_number)->first();
                 if ($fr?->public_slug) {
                     $applicant_name = $fr->full_name;
-                    $tracking_url = route('funding-request.success', ['locale' => $locale, 'public_slug' => $fr->public_slug]);
+                    $tracking_url = LocalizedRouteSlugs::route('funding-request.success', ['locale' => $locale, 'public_slug' => $fr->public_slug]);
                     if ($fr->applicantCanUploadDocuments()) {
-                        $documents_url = route('funding-request.documents', ['locale' => $locale, 'public_slug' => $fr->public_slug]);
+                        $documents_url = LocalizedRouteSlugs::route('funding-request.documents', ['locale' => $locale, 'public_slug' => $fr->public_slug]);
                     }
                 }
             }
@@ -193,8 +202,9 @@ class FundingRequestController extends Controller
         ]);
     }
 
-    public function downloadDonationActApplicant(string $locale, string $public_slug): StreamedResponse|\Illuminate\Http\RedirectResponse
+    public function downloadDonationActApplicant(string $locale, Request $request): StreamedResponse|\Illuminate\Http\RedirectResponse
     {
+        $public_slug = (string) $request->route('public_slug', '');
         $fr = FundingRequest::query()->where('public_slug', $public_slug)->firstOrFail();
 
         if (! $fr->applicantCanDownloadDonationAct()) {
@@ -214,8 +224,9 @@ class FundingRequestController extends Controller
         );
     }
 
-    public function documentsForm(string $locale, string $public_slug)
+    public function documentsForm(string $locale, Request $request)
     {
+        $public_slug = (string) $request->route('public_slug', '');
         $fr = FundingRequest::query()->where('public_slug', $public_slug)->firstOrFail();
 
         if ($fr->documentsComplete() && in_array($fr->status, [
@@ -228,7 +239,10 @@ class FundingRequestController extends Controller
 
         if (! $fr->applicantCanUploadDocuments()) {
             return redirect()
-                ->route('funding-request.success', ['public_slug' => $fr->public_slug])
+                ->route('funding-request.success', [
+                    'locale' => $locale,
+                    'public_slug' => $fr->public_slug,
+                ])
                 ->with('info', __('funding.documents_link_not_needed'));
         }
 
@@ -237,13 +251,17 @@ class FundingRequestController extends Controller
         ]);
     }
 
-    public function documentsStore(string $locale, Request $request, string $public_slug)
+    public function documentsStore(string $locale, Request $request)
     {
+        $public_slug = (string) $request->route('public_slug', '');
         $fr = FundingRequest::query()->where('public_slug', $public_slug)->firstOrFail();
 
         if (! $fr->applicantCanUploadDocuments()) {
             return redirect()
-                ->route('funding-request.success', ['public_slug' => $fr->public_slug])
+                ->route('funding-request.success', [
+                    'locale' => $locale,
+                    'public_slug' => $fr->public_slug,
+                ])
                 ->with('info', __('funding.documents_upload_unavailable'));
         }
 
@@ -300,7 +318,10 @@ class FundingRequestController extends Controller
         if (! $hadUpload) {
             if ($fr->documentsComplete()) {
                 return redirect()
-                    ->route('funding-request.documents', ['public_slug' => $fr->public_slug])
+                    ->route('funding-request.documents', [
+                        'locale' => $locale,
+                        'public_slug' => $fr->public_slug,
+                    ])
                     ->with('ok', __('funding.documents_already_complete'));
             }
 
@@ -352,7 +373,7 @@ class FundingRequestController extends Controller
                 if ($adminEmail) {
                     Mail::to($adminEmail)->send(
                         (new FundingDocumentsReceivedAdminMail($fr))
-                            ->locale(config('locales.default', 'fr'))
+                            ->locale('fr')
                     );
                 }
             }
@@ -364,11 +385,18 @@ class FundingRequestController extends Controller
 
         if ($fr->status === FundingRequest::STATUS_DOCUMENTS_RECEIVED) {
             return redirect()
-                ->route('funding-request.success', ['public_slug' => $fr->public_slug, 'context' => 'documents']);
+                ->route('funding-request.success', [
+                    'locale' => $locale,
+                    'public_slug' => $fr->public_slug,
+                    'context' => 'documents',
+                ]);
         }
 
         return redirect()
-            ->route('funding-request.documents', ['public_slug' => $fr->public_slug])
+            ->route('funding-request.documents', [
+                'locale' => $locale,
+                'public_slug' => $fr->public_slug,
+            ])
             ->with('ok', $message);
     }
 

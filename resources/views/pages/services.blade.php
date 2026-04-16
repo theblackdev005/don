@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', config('site.name').' | '.__('pages.services.title'))
+@section('title', __('pages.services.title'))
 
 @push('meta')
   @include('partials.meta-default')
@@ -289,7 +289,7 @@
       </div>
     </section>
 </main>
-@include('partials.footers.compact')
+@include('partials.footers.marketing')
 @endsection
 
 @push('vendor-scripts')

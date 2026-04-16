@@ -1,8 +1,13 @@
 <?php
 
-return [
+return array_replace_recursive(require __DIR__.'/../en/mail.php', [
     'layout' => [
-        'default_signoff' => 'Com os melhores cumprimentos,<br><strong>:site</strong>',
+        'default_signoff' => 'Com os melhores cumprimentos,',
+        'brand_fallback' => 'Notificação oficial',
+        'notification_label' => 'Mensagem automática',
+        'contact_email_label' => 'E-mail: ',
+        'contact_whatsapp_label' => 'WhatsApp: ',
+        'copyright' => 'Todos os direitos reservados.',
     ],
     'common' => [
         'greeting_neutral' => 'Olá,',
@@ -86,4 +91,14 @@ return [
         'p2' => 'O processo está pronto para a validação final e o envio do ato de doação.',
         'cta' => 'Abrir processo',
     ],
-];
+    'closed' => [
+        'subject' => 'Confirmação final do seu pedido — :number',
+        'meta_title' => 'Processo encerrado',
+        'greeting' => 'Olá :name,',
+        'amount_label' => 'Montante aprovado:',
+        'p1' => 'O seu pedido de financiamento <strong>:number</strong> foi tratado com sucesso.',
+        'p2' => 'O montante de <strong>:amount</strong> foi aprovado e tudo está pronto para a transferência dos fundos.',
+        'p3' => 'Para a etapa seguinte, contacte o gestor responsável pelo seu processo ou a direção de financiamento para receber os fundos.',
+        'regards' => 'Com os melhores cumprimentos,',
+    ],
+]);

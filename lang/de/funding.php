@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array_replace_recursive(require __DIR__.'/../en/funding.php', [
     'meta_title' => 'Antrag auf finanzielle Hilfe',
     'breadcrumb_current' => 'Antrag auf finanzielle Hilfe',
     'heading' => 'Antrag auf finanzielle Hilfe',
@@ -133,4 +133,4 @@ return [
             'body' => 'Ihr Vorgang ist erfasst. Weitere Informationen finden Sie in den per E-Mail mitgeteilten Kontaktdaten.',
         ],
     ],
-];
+]);

@@ -11,19 +11,19 @@ return [
 
     'tagline' => env('SITE_TAGLINE', ''),
 
+    'brand' => [
+        'logo_path' => trim((string) env('SITE_LOGO_PATH', 'assets/img/branding/humanity-impact.png'), '/'),
+        'favicon_path' => trim((string) env('SITE_FAVICON_PATH', 'assets/app-icons/icon-32x32.png'), '/'),
+    ],
+
     'labels' => [
         'member_area' => env('SITE_LABEL_MEMBER_AREA', 'Espace membre'),
         'dashboard' => env('SITE_LABEL_DASHBOARD', 'Espace compte'),
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | SEO / meta (défauts pour les pages)
-    |--------------------------------------------------------------------------
-    */
-    'meta' => [
-        'description_suffix' => env('SITE_META_DESCRIPTION', 'Modèle de site Bootstrap polyvalent'),
-        'keywords' => env('SITE_META_KEYWORDS', 'bootstrap, entreprise, site vitrine, landing, responsive'),
+    'tracking' => [
+        'google_tag_id' => trim((string) env('SITE_GOOGLE_TAG_ID', '')),
+        'facebook_pixel_id' => trim((string) env('SITE_FACEBOOK_PIXEL_ID', '')),
     ],
 
     /*
@@ -34,7 +34,23 @@ return [
     */
     'email' => env('SITE_EMAIL', 'contact@example.com'),
 
+    'public_contact_email' => env('SITE_PUBLIC_CONTACT_EMAIL', env('SITE_EMAIL', 'contact@example.com')),
+
+    'whatsapp' => trim((string) env('SITE_WHATSAPP', env('SITE_PHONE', ''))),
+
+    'legal' => [
+        'full_name' => trim((string) env('SITE_LEGAL_FULL_NAME', '')),
+        'company_number' => trim((string) env('SITE_COMPANY_NUMBER', '')),
+        'main_address' => trim((string) env('SITE_MAIN_ADDRESS', env('SITE_ADDRESS', ''))),
+    ],
+
     'phone' => env('SITE_PHONE', '+178632256040'),
+
+    'social' => [
+        'facebook' => trim((string) env('SITE_SOCIAL_FACEBOOK', '')),
+        'instagram' => trim((string) env('SITE_SOCIAL_INSTAGRAM', '')),
+        'linkedin' => trim((string) env('SITE_SOCIAL_LINKEDIN', '')),
+    ],
 
     /*
     |--------------------------------------------------------------------------

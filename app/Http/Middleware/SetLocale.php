@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\LocalizedRouteSlugs;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -26,7 +27,32 @@ class SetLocale
         }
 
         App::setLocale($locale);
-        URL::defaults(['locale' => $locale]);
+        URL::defaults(array_merge(
+            ['locale' => $locale],
+            LocalizedRouteSlugs::defaultsForLocale($locale)
+        ));
+
+        $route = $request->route();
+        $routeName = $route?->getName();
+        $routeParameters = $route
+            ? array_intersect_key($route->parameters(), array_flip($route->parameterNames()))
+            : [];
+
+        if (
+            $routeName &&
+            in_array($request->method(), ['GET', 'HEAD'], true) &&
+            LocalizedRouteSlugs::hasMismatch($routeName, $routeParameters, $locale)
+        ) {
+            $parameters = LocalizedRouteSlugs::applyLocalizedParameters($routeName, $routeParameters, $locale);
+            $targetUrl = route($routeName, $parameters, false);
+            $queryString = $request->getQueryString();
+
+            if ($queryString) {
+                $targetUrl .= '?'.$queryString;
+            }
+
+            return redirect($targetUrl, 302);
+        }
 
         return $next($request);
     }

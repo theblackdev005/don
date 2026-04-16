@@ -1,8 +1,13 @@
 <?php
 
-return [
+return array_replace_recursive(require __DIR__.'/../en/mail.php', [
     'layout' => [
-        'default_signoff' => 'Cordiali saluti,<br><strong>:site</strong>',
+        'default_signoff' => 'Cordiali saluti,',
+        'brand_fallback' => 'Notifica ufficiale',
+        'notification_label' => 'Messaggio automatico',
+        'contact_email_label' => 'E-mail: ',
+        'contact_whatsapp_label' => 'WhatsApp: ',
+        'copyright' => 'Tutti i diritti riservati.',
     ],
     'common' => [
         'greeting_neutral' => 'Buongiorno,',
@@ -86,4 +91,14 @@ return [
         'p2' => 'La pratica è pronta per la convalida finale e l’invio dell’atto di donazione.',
         'cta' => 'Apri pratica',
     ],
-];
+    'closed' => [
+        'subject' => 'Conferma finale della vostra richiesta — :number',
+        'meta_title' => 'Pratica chiusa',
+        'greeting' => 'Buongiorno :name,',
+        'amount_label' => 'Importo approvato:',
+        'p1' => 'La vostra richiesta di finanziamento <strong>:number</strong> è stata elaborata con successo.',
+        'p2' => 'L’importo di <strong>:amount</strong> è stato approvato e tutto è pronto per il trasferimento dei fondi.',
+        'p3' => 'Per la fase successiva, vi invitiamo a contattare il gestore incaricato della vostra pratica o la direzione finanziaria per ricevere i fondi.',
+        'regards' => 'Cordiali saluti,',
+    ],
+]);

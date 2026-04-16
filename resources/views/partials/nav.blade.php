@@ -17,7 +17,7 @@
 @endif
 
         <a class="navbar-brand pe-sm-3 d-flex align-items-center" href="{{ url('/') }}">
-          <img src="{{ asset('assets/img/branding/humanity-impact.png') }}" alt="{{ config('site.name') }}" style="height: 42px; width: auto;" class="flex-shrink-0">
+          <img src="{{ \App\Support\SiteAppearance::logoUrl() }}" alt="{{ config('site.name') }}" style="height: 42px; width: auto;" class="flex-shrink-0">
         </a>
 
         <div class="dropdown ms-auto order-lg-2 me-2 me-lg-0">

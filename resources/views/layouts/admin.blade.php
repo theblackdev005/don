@@ -10,8 +10,8 @@
   @stack('meta')
 
   <link rel="manifest" href="/manifest.json">
-  <link rel="icon" type="image/png" href="/assets/app-icons/icon-32x32.png" sizes="32x32">
-  <link rel="apple-touch-icon" href="/assets/app-icons/icon-180x180.png">
+  <link rel="icon" href="{{ \App\Support\SiteAppearance::faviconUrl() }}">
+  <link rel="apple-touch-icon" href="{{ \App\Support\SiteAppearance::faviconUrl() }}">
 
   <script src="/assets/js/theme-switcher.js"></script>
 
@@ -33,13 +33,13 @@
       --admin-soft: #f5f7fb;
       --admin-muted: #6b7a90;
       --admin-heading: #172033;
-      --admin-accent: #ffb400;
+      --admin-accent: #A87400;
     }
 
     body.admin-shell {
       background:
         radial-gradient(circle at top left, rgba(255, 180, 0, 0.08), transparent 28%),
-        radial-gradient(circle at top right, rgba(13, 110, 253, 0.08), transparent 24%),
+        radial-gradient(circle at top right, rgba(var(--bs-primary-rgb), 0.08), transparent 24%),
         linear-gradient(180deg, #f7f9fc 0%, #eef3f9 100%);
     }
 
@@ -117,8 +117,8 @@
     }
 
     .admin-side-link.active {
-      background: rgba(255, 180, 0, 0.12);
-      color: #926600;
+      background: rgba(255, 180, 0, 0.14);
+      color: var(--admin-accent);
     }
 
     .admin-content-shell {
@@ -145,7 +145,7 @@
     [data-bs-theme="dark"] body.admin-shell {
       background:
         radial-gradient(circle at top left, rgba(255, 180, 0, 0.06), transparent 28%),
-        radial-gradient(circle at top right, rgba(13, 110, 253, 0.08), transparent 24%),
+        radial-gradient(circle at top right, rgba(var(--bs-primary-rgb), 0.08), transparent 24%),
         linear-gradient(180deg, #12161b 0%, #0f1317 100%);
     }
 
@@ -179,7 +179,7 @@
     <header class="navbar navbar-expand-lg fixed-top admin-topbar">
       <div class="container">
         <a class="navbar-brand pe-sm-3 admin-brand d-flex align-items-center" href="{{ route('admin.dashboard') }}">
-          <img src="{{ asset('assets/img/branding/humanity-impact.png') }}" alt="{{ config('site.name') }}" style="height: 40px; width: auto;" class="flex-shrink-0">
+          <img src="{{ \App\Support\SiteAppearance::logoUrl() }}" alt="{{ config('site.name') }}" style="height: 40px; width: auto;" class="flex-shrink-0">
         </a>
 
         <div class="form-check form-switch mode-switch order-lg-2 me-3 me-lg-4 ms-auto admin-theme-switch" data-bs-toggle="mode">
@@ -214,13 +214,21 @@
                 <i class="ai-settings fs-lg opacity-70 me-2"></i>
                 Configuration
               </a>
+              <a class="dropdown-item" href="{{ route('admin.testimonials.index') }}">
+                <i class="ai-messages fs-lg opacity-70 me-2"></i>
+                Témoignages
+              </a>
               <a class="dropdown-item" href="{{ route('admin.settings.password.edit') }}">
-                <i class="ai-lock fs-lg opacity-70 me-2"></i>
+                <i class="ai-lock-closed fs-lg opacity-70 me-2"></i>
                 Code d’accès
               </a>
               <a class="dropdown-item" href="{{ route('admin.guide') }}">
-                <i class="ai-book-open fs-lg opacity-70 me-2"></i>
+                <i class="ai-open-book fs-lg opacity-70 me-2"></i>
                 Guide admin
+              </a>
+              <a class="dropdown-item" href="{{ route('admin.smtp.edit') }}">
+                <i class="ai-at fs-lg opacity-70 me-2"></i>
+                SMTP
               </a>
               <div class="dropdown-divider"></div>
               <form method="post" action="{{ route('admin.logout') }}" class="d-grid">
@@ -251,11 +259,34 @@
                   </div>
                 </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="{{ route('admin.dashboard') }}">Tableau de bord</a>
-                  <a class="dropdown-item" href="{{ route('admin.funding-requests.index') }}">Toutes les demandes</a>
-                  <a class="dropdown-item" href="{{ route('admin.settings.edit') }}">Configuration</a>
-                  <a class="dropdown-item" href="{{ route('admin.settings.password.edit') }}">Code d’accès</a>
-                  <a class="dropdown-item" href="{{ route('admin.guide') }}">Guide admin</a>
+                  <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
+                    <i class="ai-user-check fs-lg opacity-70 me-2"></i>
+                    Tableau de bord
+                  </a>
+                  <a class="dropdown-item" href="{{ route('admin.funding-requests.index') }}">
+                    <i class="ai-folder fs-lg opacity-70 me-2"></i>
+                    Toutes les demandes
+                  </a>
+                  <a class="dropdown-item" href="{{ route('admin.settings.edit') }}">
+                    <i class="ai-settings fs-lg opacity-70 me-2"></i>
+                    Configuration
+                  </a>
+                  <a class="dropdown-item" href="{{ route('admin.testimonials.index') }}">
+                    <i class="ai-messages fs-lg opacity-70 me-2"></i>
+                    Témoignages
+                  </a>
+                  <a class="dropdown-item" href="{{ route('admin.settings.password.edit') }}">
+                    <i class="ai-lock-closed fs-lg opacity-70 me-2"></i>
+                    Code d’accès
+                  </a>
+                  <a class="dropdown-item" href="{{ route('admin.guide') }}">
+                    <i class="ai-open-book fs-lg opacity-70 me-2"></i>
+                    Guide admin
+                  </a>
+                  <a class="dropdown-item" href="{{ route('admin.smtp.edit') }}">
+                    <i class="ai-at fs-lg opacity-70 me-2"></i>
+                    SMTP
+                  </a>
                   <div class="dropdown-divider"></div>
                   <form method="post" action="{{ route('admin.logout') }}" class="px-3 py-1">
                     @csrf
@@ -281,7 +312,7 @@
                 <div class="admin-side-panel">
                 <div class="mb-4">
                   <a href="{{ route('admin.dashboard') }}" class="d-inline-flex align-items-center text-decoration-none">
-                    <img src="{{ asset('assets/img/branding/humanity-impact.png') }}" alt="{{ config('site.name') }}" style="height: 38px; width: auto;" class="flex-shrink-0">
+                    <img src="{{ \App\Support\SiteAppearance::logoUrl() }}" alt="{{ config('site.name') }}" style="height: 38px; width: auto;" class="flex-shrink-0">
                   </a>
                 </div>
                 <div class="admin-side-user">
@@ -302,13 +333,21 @@
                     <i class="ai-settings fs-5 opacity-60 me-2"></i>
                     Configuration
                   </a>
+                  <a class="admin-side-link fw-semibold {{ $navActive === 'testimonials' ? 'active' : '' }}" href="{{ route('admin.testimonials.index') }}">
+                    <i class="ai-messages fs-5 opacity-60 me-2"></i>
+                    Témoignages
+                  </a>
                   <a class="admin-side-link fw-semibold {{ $navActive === 'settings-password' ? 'active' : '' }}" href="{{ route('admin.settings.password.edit') }}">
-                    <i class="ai-lock fs-5 opacity-60 me-2"></i>
+                    <i class="ai-lock-closed fs-5 opacity-60 me-2"></i>
                     Code d’accès
                   </a>
                   <a class="admin-side-link fw-semibold {{ $navActive === 'guide' ? 'active' : '' }}" href="{{ route('admin.guide') }}">
-                    <i class="ai-book-open fs-5 opacity-60 me-2"></i>
+                    <i class="ai-open-book fs-5 opacity-60 me-2"></i>
                     Guide admin
+                  </a>
+                  <a class="admin-side-link fw-semibold {{ $navActive === 'smtp' ? 'active' : '' }}" href="{{ route('admin.smtp.edit') }}">
+                    <i class="ai-at fs-5 opacity-60 me-2"></i>
+                    SMTP
                   </a>
                 </nav>
                 <nav class="nav flex-column">

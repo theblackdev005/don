@@ -1,6 +1,6 @@
 @extends('layouts.form-minimal')
 
-@section('title', config('site.name').' | '.__('funding.meta_title'))
+@section('title', __('funding.meta_title'))
 
 @push('meta')
   @include('partials.meta-default')
@@ -8,6 +8,11 @@
 
 @push('head')
   <style>
+    .funding-page {
+      --funding-accent: #1f8f6b;
+      --funding-accent-rgb: 31, 143, 107;
+    }
+
     .funding-page {
       padding-top: clamp(1.5rem, 4vh, 3rem);
       padding-bottom: clamp(3rem, 6vh, 4.5rem);
@@ -71,8 +76,9 @@
     }
 
     .funding-step.active {
-      border-color: rgba(var(--bs-primary-rgb), .24);
-      background: rgba(var(--bs-primary-rgb), .08);
+      border-color: rgba(var(--funding-accent-rgb), .24);
+      background: rgba(var(--funding-accent-rgb), .08);
+      box-shadow: 0 10px 24px rgba(31, 143, 107, 0.08);
     }
 
     .funding-step-index {
@@ -90,8 +96,9 @@
     }
 
     .funding-step.active .funding-step-index {
-      background: var(--bs-primary);
+      background: var(--funding-accent);
       color: #fff;
+      box-shadow: 0 10px 18px rgba(31, 143, 107, 0.18);
     }
 
     .funding-step-text {
@@ -152,8 +159,8 @@
       min-height: 2rem;
       padding: .35rem .75rem;
       border-radius: 999px;
-      background: rgba(var(--bs-primary-rgb), .08);
-      color: var(--bs-primary);
+      background: rgba(var(--funding-accent-rgb), .08);
+      color: var(--funding-accent);
       font-size: .8rem;
       font-weight: 800;
       white-space: nowrap;
@@ -183,8 +190,8 @@
 
     .funding-form .form-control:focus,
     .funding-form .form-select:focus {
-      border-color: rgba(var(--bs-primary-rgb), .45);
-      box-shadow: 0 0 0 .2rem rgba(var(--bs-primary-rgb), .10);
+      border-color: rgba(var(--funding-accent-rgb), .45);
+      box-shadow: 0 0 0 .2rem rgba(var(--funding-accent-rgb), .10);
     }
 
     .funding-option-list {
@@ -218,8 +225,9 @@
     }
 
     .funding-option:has(.form-check-input:checked) {
-      border-color: rgba(var(--bs-primary-rgb), .24);
-      background: rgba(var(--bs-primary-rgb), .06);
+      border-color: rgba(var(--funding-accent-rgb), .24);
+      background: rgba(var(--funding-accent-rgb), .06);
+      box-shadow: 0 10px 22px rgba(31, 143, 107, 0.06);
     }
 
     .funding-phone {
@@ -323,6 +331,50 @@
 @endphp
 
 @section('content')
+@php
+  $countryOptions = collect(__('country_contact'))
+    ->map(fn ($label, $index) => ['index' => $index, 'label' => $label])
+    ->values();
+
+  $phonePrefixOptions = [
+    ['country_index' => 13, 'flag' => '🇫🇷', 'prefix' => '+33'],
+    ['country_index' => 14, 'flag' => '🇩🇪', 'prefix' => '+49'],
+    ['country_index' => 2, 'flag' => '🇦🇹', 'prefix' => '+43'],
+    ['country_index' => 3, 'flag' => '🇧🇪', 'prefix' => '+32'],
+    ['country_index' => 6, 'flag' => '🇧🇬', 'prefix' => '+359'],
+    ['country_index' => 8, 'flag' => '🇨🇾', 'prefix' => '+357'],
+    ['country_index' => 7, 'flag' => '🇭🇷', 'prefix' => '+385'],
+    ['country_index' => 10, 'flag' => '🇩🇰', 'prefix' => '+45'],
+    ['country_index' => 40, 'flag' => '🇪🇸', 'prefix' => '+34'],
+    ['country_index' => 11, 'flag' => '🇪🇪', 'prefix' => '+372'],
+    ['country_index' => 12, 'flag' => '🇫🇮', 'prefix' => '+358'],
+    ['country_index' => 15, 'flag' => '🇬🇷', 'prefix' => '+30'],
+    ['country_index' => 16, 'flag' => '🇭🇺', 'prefix' => '+36'],
+    ['country_index' => 18, 'flag' => '🇮🇪', 'prefix' => '+353'],
+    ['country_index' => 19, 'flag' => '🇮🇹', 'prefix' => '+39'],
+    ['country_index' => 21, 'flag' => '🇱🇻', 'prefix' => '+371'],
+    ['country_index' => 23, 'flag' => '🇱🇹', 'prefix' => '+370'],
+    ['country_index' => 24, 'flag' => '🇱🇺', 'prefix' => '+352'],
+    ['country_index' => 25, 'flag' => '🇲🇹', 'prefix' => '+356'],
+    ['country_index' => 29, 'flag' => '🇳🇱', 'prefix' => '+31'],
+    ['country_index' => 32, 'flag' => '🇵🇱', 'prefix' => '+48'],
+    ['country_index' => 33, 'flag' => '🇵🇹', 'prefix' => '+351'],
+    ['country_index' => 34, 'flag' => '🇷🇴', 'prefix' => '+40'],
+    ['country_index' => 38, 'flag' => '🇸🇰', 'prefix' => '+421'],
+    ['country_index' => 39, 'flag' => '🇸🇮', 'prefix' => '+386'],
+    ['country_index' => 41, 'flag' => '🇸🇪', 'prefix' => '+46'],
+    ['country_index' => 9, 'flag' => '🇨🇿', 'prefix' => '+420'],
+  ];
+
+  $phonePrefixOptions = collect($phonePrefixOptions)
+    ->map(function (array $option) use ($countryOptions) {
+      $country = $countryOptions->firstWhere('index', $option['country_index']);
+      $option['country_label'] = $country['label'] ?? null;
+
+      return $option;
+    })
+    ->all();
+@endphp
 <main class="page-wrapper">
   @include('partials.form-page-header')
   @php($pageLocale = request()->route('locale') ?? app()->getLocale())
@@ -371,7 +423,7 @@
             </div>
           @endif
 
-          <form id="funding-request-form" class="funding-form needs-validation" action="{{ route('funding-request.store', ['locale' => $pageLocale]) }}" method="post" novalidate>
+          <form id="funding-request-form" class="funding-form needs-validation" action="{{ \App\Support\LocalizedRouteSlugs::route('funding-request.store', ['locale' => $pageLocale]) }}" method="post" novalidate>
             @csrf
 
             <section class="funding-panel" data-funding-step-panel="1">
@@ -380,7 +432,7 @@
                   <h2 class="funding-panel-title">{{ __('funding.step1_title') }}</h2>
                   <p class="funding-panel-note">{{ __('funding.step1_note') }}</p>
                 </div>
-                <span class="funding-panel-badge">Étape 1</span>
+                <span class="funding-panel-badge">{{ __('funding.step_badge', ['number' => 1]) }}</span>
               </div>
 
               <div class="row g-3">
@@ -393,33 +445,9 @@
                   <label class="form-label" for="country">{{ __('funding.country') }} <span class="text-danger">*</span></label>
                   <select class="form-select" name="country" id="country" required>
                     <option value="" disabled @selected(! old('country', ''))>{{ __('funding.placeholder_country') }}</option>
-                    <option value="France" @selected(old('country') === 'France')>France</option>
-                    <option value="Allemagne" @selected(old('country') === 'Allemagne')>Allemagne</option>
-                    <option value="Autriche" @selected(old('country') === 'Autriche')>Autriche</option>
-                    <option value="Belgique" @selected(old('country') === 'Belgique')>Belgique</option>
-                    <option value="Bulgarie" @selected(old('country') === 'Bulgarie')>Bulgarie</option>
-                    <option value="Chypre" @selected(old('country') === 'Chypre')>Chypre</option>
-                    <option value="Croatie" @selected(old('country') === 'Croatie')>Croatie</option>
-                    <option value="Danemark" @selected(old('country') === 'Danemark')>Danemark</option>
-                    <option value="Espagne" @selected(old('country') === 'Espagne')>Espagne</option>
-                    <option value="Estonie" @selected(old('country') === 'Estonie')>Estonie</option>
-                    <option value="Finlande" @selected(old('country') === 'Finlande')>Finlande</option>
-                    <option value="Grèce" @selected(old('country') === 'Grèce')>Grèce</option>
-                    <option value="Hongrie" @selected(old('country') === 'Hongrie')>Hongrie</option>
-                    <option value="Irlande" @selected(old('country') === 'Irlande')>Irlande</option>
-                    <option value="Italie" @selected(old('country') === 'Italie')>Italie</option>
-                    <option value="Lettonie" @selected(old('country') === 'Lettonie')>Lettonie</option>
-                    <option value="Lituanie" @selected(old('country') === 'Lituanie')>Lituanie</option>
-                    <option value="Luxembourg" @selected(old('country') === 'Luxembourg')>Luxembourg</option>
-                    <option value="Malte" @selected(old('country') === 'Malte')>Malte</option>
-                    <option value="Pays-Bas" @selected(old('country') === 'Pays-Bas')>Pays-Bas</option>
-                    <option value="Pologne" @selected(old('country') === 'Pologne')>Pologne</option>
-                    <option value="Portugal" @selected(old('country') === 'Portugal')>Portugal</option>
-                    <option value="Roumanie" @selected(old('country') === 'Roumanie')>Roumanie</option>
-                    <option value="Slovaquie" @selected(old('country') === 'Slovaquie')>Slovaquie</option>
-                    <option value="Slovénie" @selected(old('country') === 'Slovénie')>Slovénie</option>
-                    <option value="Suède" @selected(old('country') === 'Suède')>Suède</option>
-                    <option value="Tchéquie" @selected(old('country') === 'Tchéquie')>Tchéquie</option>
+                    @foreach ($countryOptions as $country)
+                      <option value="{{ $country['label'] }}" @selected(old('country') === $country['label'])>{{ $country['label'] }}</option>
+                    @endforeach
                   </select>
                   <div class="invalid-feedback">{{ __('funding.invalid_country') }}</div>
                 </div>
@@ -437,33 +465,12 @@
                   <label class="form-label" for="phone">{{ __('funding.phone') }} <span class="text-danger">*</span></label>
                   <div class="funding-phone">
                     <select class="form-select" name="phone_prefix" id="phone_prefix">
-                      <option value="+33" @selected(old('phone_prefix') === '+33' || (!old('phone_prefix') && old('country') === 'France'))>🇫🇷 +33</option>
-                      <option value="+49" @selected(old('phone_prefix') === '+49' || (!old('phone_prefix') && old('country') === 'Allemagne'))>🇩🇪 +49</option>
-                      <option value="+43" @selected(old('phone_prefix') === '+43' || (!old('phone_prefix') && old('country') === 'Autriche'))>🇦🇹 +43</option>
-                      <option value="+32" @selected(old('phone_prefix') === '+32' || (!old('phone_prefix') && old('country') === 'Belgique'))>🇧🇪 +32</option>
-                      <option value="+359" @selected(old('phone_prefix') === '+359' || (!old('phone_prefix') && old('country') === 'Bulgarie'))>🇧🇬 +359</option>
-                      <option value="+357" @selected(old('phone_prefix') === '+357' || (!old('phone_prefix') && old('country') === 'Chypre'))>🇨🇾 +357</option>
-                      <option value="+385" @selected(old('phone_prefix') === '+385' || (!old('phone_prefix') && old('country') === 'Croatie'))>🇭🇷 +385</option>
-                      <option value="+45" @selected(old('phone_prefix') === '+45' || (!old('phone_prefix') && old('country') === 'Danemark'))>🇩🇰 +45</option>
-                      <option value="+34" @selected(old('phone_prefix') === '+34' || (!old('phone_prefix') && old('country') === 'Espagne'))>🇪🇸 +34</option>
-                      <option value="+372" @selected(old('phone_prefix') === '+372' || (!old('phone_prefix') && old('country') === 'Estonie'))>🇪🇪 +372</option>
-                      <option value="+358" @selected(old('phone_prefix') === '+358' || (!old('phone_prefix') && old('country') === 'Finlande'))>🇫🇮 +358</option>
-                      <option value="+30" @selected(old('phone_prefix') === '+30' || (!old('phone_prefix') && old('country') === 'Grèce'))>🇬🇷 +30</option>
-                      <option value="+36" @selected(old('phone_prefix') === '+36' || (!old('phone_prefix') && old('country') === 'Hongrie'))>🇭🇺 +36</option>
-                      <option value="+353" @selected(old('phone_prefix') === '+353' || (!old('phone_prefix') && old('country') === 'Irlande'))>🇮🇪 +353</option>
-                      <option value="+39" @selected(old('phone_prefix') === '+39' || (!old('phone_prefix') && old('country') === 'Italie'))>🇮🇹 +39</option>
-                      <option value="+371" @selected(old('phone_prefix') === '+371' || (!old('phone_prefix') && old('country') === 'Lettonie'))>🇱🇻 +371</option>
-                      <option value="+370" @selected(old('phone_prefix') === '+370' || (!old('phone_prefix') && old('country') === 'Lituanie'))>🇱🇹 +370</option>
-                      <option value="+352" @selected(old('phone_prefix') === '+352' || (!old('phone_prefix') && old('country') === 'Luxembourg'))>🇱🇺 +352</option>
-                      <option value="+356" @selected(old('phone_prefix') === '+356' || (!old('phone_prefix') && old('country') === 'Malte'))>🇲🇹 +356</option>
-                      <option value="+31" @selected(old('phone_prefix') === '+31' || (!old('phone_prefix') && old('country') === 'Pays-Bas'))>🇳🇱 +31</option>
-                      <option value="+48" @selected(old('phone_prefix') === '+48' || (!old('phone_prefix') && old('country') === 'Pologne'))>🇵🇱 +48</option>
-                      <option value="+351" @selected(old('phone_prefix') === '+351' || (!old('phone_prefix') && old('country') === 'Portugal'))>🇵🇹 +351</option>
-                      <option value="+40" @selected(old('phone_prefix') === '+40' || (!old('phone_prefix') && old('country') === 'Roumanie'))>🇷🇴 +40</option>
-                      <option value="+421" @selected(old('phone_prefix') === '+421' || (!old('phone_prefix') && old('country') === 'Slovaquie'))>🇸🇰 +421</option>
-                      <option value="+386" @selected(old('phone_prefix') === '+386' || (!old('phone_prefix') && old('country') === 'Slovénie'))>🇸🇮 +386</option>
-                      <option value="+46" @selected(old('phone_prefix') === '+46' || (!old('phone_prefix') && old('country') === 'Suède'))>🇸🇪 +46</option>
-                      <option value="+420" @selected(old('phone_prefix') === '+420' || (!old('phone_prefix') && old('country') === 'Tchéquie'))>🇨🇿 +420</option>
+                      @foreach ($phonePrefixOptions as $phoneOption)
+                        <option
+                          value="{{ $phoneOption['prefix'] }}"
+                          @selected(old('phone_prefix') === $phoneOption['prefix'] || (!old('phone_prefix') && old('country') === ($phoneOption['country_label'] ?? null)))
+                        >{{ $phoneOption['flag'] }} {{ $phoneOption['prefix'] }}</option>
+                      @endforeach
                     </select>
                     <input class="form-control" type="tel" name="phone" id="phone" value="{{ old('phone') }}" required maxlength="15" autocomplete="tel" placeholder="{{ __('funding.placeholder_phone') }}">
                   </div>
@@ -478,7 +485,7 @@
                   <h2 class="funding-panel-title">{{ __('funding.step2_title') }}</h2>
                   <p class="funding-panel-note">{{ __('funding.step2_note') }}</p>
                 </div>
-                <span class="funding-panel-badge">Étape 2</span>
+                <span class="funding-panel-badge">{{ __('funding.step_badge', ['number' => 2]) }}</span>
               </div>
 
               <fieldset class="mb-4">
@@ -517,7 +524,7 @@
                   <h2 class="funding-panel-title">{{ __('funding.step3_title') }}</h2>
                   <p class="funding-panel-note">{{ __('funding.step3_note') }}</p>
                 </div>
-                <span class="funding-panel-badge">Étape 3</span>
+                <span class="funding-panel-badge">{{ __('funding.step_badge', ['number' => 3]) }}</span>
               </div>
 
               <div class="mb-4">
@@ -562,7 +569,7 @@
               <div class="funding-actions-end">
                 <button type="button" class="btn btn-primary" id="funding-next">{{ __('funding.btn_next') }}</button>
                 <div id="funding-submit-group" class="funding-submit-wrap">
-                  <button class="btn btn-primary" type="submit">{{ __('funding.submit') }}</button>
+                  <button class="btn btn-primary" type="submit" data-submit-loading-text="{{ __('ui.common.submitting') }}">{{ __('funding.submit') }}</button>
                 </div>
               </div>
             </div>

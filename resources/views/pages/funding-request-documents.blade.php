@@ -1,6 +1,6 @@
 @extends('layouts.form-minimal')
 
-@section('title', config('site.name').' | '.__('pages.documents.title'))
+@section('title', __('pages.documents.title'))
 
 @push('meta')
   @include('partials.meta-default')
@@ -249,7 +249,7 @@
             {{ __('pages.documents.intro') }}
           </div>
 
-          <form method="post" action="{{ route('funding-request.documents.store', ['locale' => request()->route('locale'), 'public_slug' => $fr->public_slug]) }}" enctype="multipart/form-data" class="documents-form">
+          <form method="post" action="{{ \App\Support\LocalizedRouteSlugs::route('funding-request.documents.store', ['locale' => request()->route('locale'), 'public_slug' => $fr->public_slug]) }}" enctype="multipart/form-data" class="documents-form">
             @csrf
 
             <div class="documents-block">
@@ -308,7 +308,7 @@
             </div>
 
             <div class="documents-submit">
-              <button type="submit" class="btn btn-primary">{{ __('pages.documents.send') }}</button>
+              <button type="submit" class="btn btn-primary" data-submit-loading-text="{{ __('ui.common.submitting') }}">{{ __('pages.documents.send') }}</button>
             </div>
           </form>
         </div>

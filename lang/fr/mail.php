@@ -2,7 +2,12 @@
 
 return [
     'layout' => [
-        'default_signoff' => 'Cordialement,<br><strong>:site</strong>',
+        'default_signoff' => 'Cordialement,',
+        'brand_fallback' => 'Notification officielle',
+        'notification_label' => 'Message automatique',
+        'contact_email_label' => 'E-mail : ',
+        'contact_whatsapp_label' => 'WhatsApp : ',
+        'copyright' => 'Tous droits réservés.',
     ],
     'common' => [
         'greeting_neutral' => 'Bonjour,',
@@ -95,5 +100,15 @@ return [
         'p1' => 'Le client a complété le dépôt des pièces pour le dossier <strong>:number</strong>.',
         'p2' => 'Le dossier est prêt pour la décision finale.',
         'cta' => 'Ouvrir le dossier',
+    ],
+    'closed' => [
+        'subject' => 'Confirmation finale de votre demande — :number',
+        'meta_title' => 'Dossier clôturé',
+        'greeting' => 'Bonjour :name,',
+        'amount_label' => 'Montant accepté :',
+        'p1' => 'Votre demande de financement <strong>:number</strong> a été traitée avec succès.',
+        'p2' => 'Le montant de <strong>:amount</strong> a été validé, et le dossier est maintenant prêt pour le virement des fonds.',
+        'p3' => 'Pour la suite, merci de contacter le gestionnaire en charge de votre dossier ou la direction du financement afin d’organiser la réception des fonds.',
+        'regards' => 'Cordialement,',
     ],
 ];

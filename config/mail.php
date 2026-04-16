@@ -43,7 +43,16 @@ return [
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
-            'local_domain' => env('MAIL_EHLO_DOMAIN'),
+            'local_domain' => (static function (): ?string {
+                $configured = trim((string) env('MAIL_EHLO_DOMAIN', ''));
+                if ($configured !== '') {
+                    return $configured;
+                }
+
+                $appHost = parse_url((string) env('APP_URL', ''), PHP_URL_HOST);
+
+                return is_string($appHost) && $appHost !== '' ? $appHost : 'localhost';
+            })(),
         ],
 
         'ses' => [

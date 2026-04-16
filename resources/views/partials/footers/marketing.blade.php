@@ -1,52 +1,88 @@
+@php
+  $facebookUrl = trim((string) config('site.social.facebook', ''));
+  $instagramUrl = trim((string) config('site.social.instagram', ''));
+  $linkedinUrl = trim((string) config('site.social.linkedin', ''));
+  $siteAddress = trim((string) config('site.address', ''));
+  $companyNumber = trim((string) config('site.legal.company_number', ''));
+  $publicContactEmail = trim((string) config('site.public_contact_email', 'contact@hiafoundation.org'));
+  $pageLocale = request()->route('locale') ?? app()->getLocale();
+  $whatsAppConfig = \App\Support\WhatsAppMessage::config('direct', ['site' => config('site.name')], $pageLocale, (string) request()->path());
+  $whatsAppUrl = $whatsAppConfig['url'] ?? null;
+@endphp
 <footer class="footer py-5">
-    <div class="container pt-md-2 pt-lg-3 pt-xl-4">
-      <div class="row pb-5 pt-sm-2 mb-lg-2">
-        <div class="col-md-12 col-lg-3 pb-2 pb-lg-0 mb-4 mb-lg-0">
-          <a class="navbar-brand py-0 mb-3 mb-lg-4 d-inline-flex align-items-center" href="{{ url('/') }}">
-            <img src="{{ asset('assets/img/branding/humanity-impact.png') }}" alt="{{ config('site.name') }}" style="height: 44px; width: auto;" class="flex-shrink-0 me-2">
-            <span class="text-nav">{{ config('site.name') }}</span>
-          </a>
-          <p class="fs-sm pb-2 pb-lg-3 mb-3">{{ __('ui.footer.about_text') }}</p>
-          <div class="d-flex">
-            <a class="btn btn-icon btn-sm btn-secondary btn-facebook rounded-circle me-3" href="#"
-              aria-label="Facebook">
-              <i class="ai-facebook"></i>
-            </a>
-            <a class="btn btn-icon btn-sm btn-secondary btn-instagram rounded-circle me-3" href="#"
-              aria-label="Instagram">
-              <i class="ai-instagram"></i>
-            </a>
-            <a class="btn btn-icon btn-sm btn-secondary btn-linkedin rounded-circle" href="#" aria-label="LinkedIn">
-              <i class="ai-linkedin"></i>
-            </a>
+  <div class="container pt-md-2 pt-lg-3 pt-xl-4">
+    <div class="row pb-5 pt-sm-2 mb-lg-2 gy-5">
+      <div class="col-lg-6 col-xl-5">
+        <a class="navbar-brand py-0 mb-3 mb-lg-4 d-inline-flex align-items-center text-decoration-none" href="{{ route('home') }}">
+          <img src="{{ asset('assets/img/certifications/eig-certified.png') }}" alt="EIG Certified" style="width: 72px; height: auto;" class="flex-shrink-0 me-3">
+          <span class="fs-sm fw-semibold text-dark">{{ __('ui.footer.certification_label') }}</span>
+        </a>
+        <div class="fs-sm text-body-secondary" style="max-width: 470px;">
+          <p class="mb-3">
+            {{ __('ui.footer.marketing_about') }}
+          </p>
+          <p class="mb-3 fw-semibold text-dark">{{ __('ui.footer.marketing_values') }}</p>
+          <div class="pt-1">
+            <p class="mb-2 fw-semibold text-dark">
+              <a class="text-decoration-none text-dark" href="mailto:{{ $publicContactEmail }}">{{ $publicContactEmail }}</a>
+            </p>
+            <p class="mb-0 fw-semibold text-dark lh-base">{{ $siteAddress !== '' ? $siteAddress : __('ui.footer.address_fallback') }}</p>
+            @if ($companyNumber !== '')
+              <p class="mb-0 mt-2 fw-semibold text-dark lh-base">{{ __('ui.footer.legal_number') }} {{ $companyNumber }}</p>
+            @endif
           </div>
         </div>
-        <div class="col-sm-3 col-lg-2 offset-xl-1 mb-4 mb-sm-0">
-          <ul class="nav flex-column">
-            <li><a class="nav-link py-1 px-0" href="{{ route('contact') }}">{{ __('ui.nav.contact') }}</a></li>
-            <li><a class="nav-link py-1 px-0" href="{{ route('funding-request.create') }}">{{ __('ui.footer.funding_request') }}</a></li>
-            <li><a class="nav-link py-1 px-0" href="{{ route('funding.tracking') }}">{{ __('ui.footer.tracking') }}</a></li>
-            <li><a class="nav-link py-1 px-0" href="{{ route('legal') }}">{{ __('ui.footer.legal') }}</a></li>
-            <li><a class="nav-link py-1 px-0" href="{{ route('privacy') }}">{{ __('ui.footer.privacy') }}</a></li>
-          </ul>
-        </div>
-        <div class="col-sm-4 col-lg-2 mb-4 mb-sm-0">
-          <ul class="nav flex-column">
-            <li><a class="nav-link py-1 px-0" href="mailto:{{ config('site.email') }}">{{ config('site.email') }}</a></li>
-            <li><a class="nav-link py-1 px-0" href="tel:{{ preg_replace('/[^+\d]/', '', config('site.phone')) }}">{!! str_replace(' ', '&nbsp;', e(config('site.phone'))) !!}</a></li>
-          </ul>
-        </div>
-        <div class="col-sm-5 col-lg-4 col-xl-3 offset-lg-1">
-          <h3 class="h6 mb-2">{{ __('ui.footer.stay_informed') }}</h3>
-          <p class="fs-sm">{{ __('ui.footer.subscribe_text') }}</p>
-          <div class="input-group input-group-sm">
-            <input class="form-control" type="text" placeholder="{{ __('ui.footer.your_email') }}">
-            <button class="btn btn-primary" type="button">{{ __('ui.footer.subscribe') }}</button>
+        @if ($facebookUrl !== '' || $instagramUrl !== '' || $linkedinUrl !== '' || $whatsAppUrl)
+          <div class="d-flex flex-wrap gap-2 mt-4">
+            @if ($whatsAppUrl)
+              <a class="btn btn-icon btn-sm btn-secondary rounded-circle" href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" data-whatsapp-prefill='@json($whatsAppConfig)'>
+                <i class="ai-whatsapp"></i>
+              </a>
+            @endif
+            @if ($facebookUrl !== '')
+              <a class="btn btn-icon btn-sm btn-secondary btn-facebook rounded-circle" href="{{ $facebookUrl }}" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                <i class="ai-facebook"></i>
+              </a>
+            @endif
+            @if ($instagramUrl !== '')
+              <a class="btn btn-icon btn-sm btn-secondary btn-instagram rounded-circle" href="{{ $instagramUrl }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <i class="ai-instagram"></i>
+              </a>
+            @endif
+            @if ($linkedinUrl !== '')
+              <a class="btn btn-icon btn-sm btn-secondary btn-linkedin rounded-circle" href="{{ $linkedinUrl }}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                <i class="ai-linkedin"></i>
+              </a>
+            @endif
           </div>
-        </div>
+        @endif
       </div>
+
+      <div class="col-6 col-lg-3 offset-xl-1">
+        <h3 class="h6 mb-3">{{ __('ui.footer.navigation') }}</h3>
+        <ul class="nav flex-column">
+          <li><a class="nav-link py-1 px-0" href="{{ route('home') }}">{{ config('site.name') }}</a></li>
+          <li><a class="nav-link py-1 px-0" href="{{ route('services') }}">{{ __('ui.nav.services') }}</a></li>
+          <li><a class="nav-link py-1 px-0" href="{{ route('about') }}">{{ __('ui.nav.about') }}</a></li>
+          <li><a class="nav-link py-1 px-0" href="{{ route('contact') }}">{{ __('ui.nav.contact') }}</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <h3 class="h6 mb-3">{{ __('ui.footer.discover') }}</h3>
+        <ul class="nav flex-column">
+          <li><a class="nav-link py-1 px-0" href="{{ route('funding-request.create') }}">{{ __('ui.footer.funding_request') }}</a></li>
+          <li><a class="nav-link py-1 px-0" href="{{ route('funding.tracking') }}">{{ __('ui.footer.tracking') }}</a></li>
+          <li><a class="nav-link py-1 px-0" href="{{ route('legal') }}">{{ __('ui.footer.legal') }}</a></li>
+          <li><a class="nav-link py-1 px-0" href="{{ route('privacy') }}">{{ __('ui.footer.privacy') }}</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="border-top pt-3 pt-md-4">
       <p class="nav fs-sm mb-0">
-        <span class="text-body-secondary">© 2019 {{ config('site.name') }}. {{ __('ui.footer.copyright') }}</span>
+        <span class="text-body-secondary">© {{ now()->year }} {{ config('site.name') }}. {{ __('ui.footer.copyright') }}</span>
       </p>
     </div>
-  </footer>
+  </div>
+</footer>

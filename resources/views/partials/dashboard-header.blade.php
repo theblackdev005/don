@@ -1,7 +1,7 @@
 <header class="navbar navbar-expand-lg sticky-top bg-body border-bottom shadow-sm">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center pe-sm-3" href="{{ route('account') }}">
-      <img src="{{ asset('assets/img/branding/humanity-impact.png') }}" alt="{{ config('site.name') }}" style="height: 40px; width: auto;" class="flex-shrink-0 me-2">
+      <img src="{{ \App\Support\SiteAppearance::logoUrl() }}" alt="{{ config('site.name') }}" style="height: 40px; width: auto;" class="flex-shrink-0 me-2">
       <span class="d-none d-sm-inline">{{ config('site.labels.dashboard') }}</span>
     </a>
 

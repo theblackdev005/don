@@ -241,7 +241,7 @@
       <div class="admin-login-header-inner">
         <a href="{{ route('home', ['locale' => app()->getLocale()]) }}" class="admin-login-header-brand">
           <span class="admin-login-header-mark">
-            <img src="{{ asset('assets/img/branding/humanity-impact-icon.png') }}" alt="" style="width: 100%; height: 100%; object-fit: contain;">
+            <img src="{{ \App\Support\SiteAppearance::logoUrl() }}" alt="{{ config('site.name') }}" style="width: 100%; height: 100%; object-fit: contain;">
           </span>
         </a>
 
@@ -258,7 +258,7 @@
       <div class="admin-login-wrap">
         <div class="admin-login-card">
           <div class="admin-login-brand">
-            <img src="{{ asset('assets/img/branding/humanity-impact.png') }}" alt="{{ config('site.name') }}" class="admin-login-brand-logo">
+            <img src="{{ \App\Support\SiteAppearance::logoUrl() }}" alt="{{ config('site.name') }}" class="admin-login-brand-logo">
           </div>
 
           <h1 class="admin-login-title">Connexion</h1>
@@ -276,6 +276,12 @@
             </div>
           @endif
 
+          @if (session('status'))
+            <div class="alert alert-success admin-login-alert">
+              {{ session('status') }}
+            </div>
+          @endif
+
           <form method="post" action="{{ route('admin.login') }}" class="admin-login-form">
             @csrf
 
@@ -286,7 +292,7 @@
                 class="form-control"
                 id="email"
                 name="email"
-                value="{{ old('email', config('site.email')) }}"
+                value="{{ old('email', config('admin.email')) }}"
                 required
                 autofocus
                 autocomplete="username">
@@ -318,6 +324,10 @@
 
             <button type="submit" class="btn btn-primary w-100 admin-login-submit">Se connecter</button>
           </form>
+
+          <div class="mt-3 text-center">
+            <a href="{{ route('admin.password.request') }}" class="text-decoration-none fw-semibold">Mot de passe oublié ?</a>
+          </div>
 
           <p class="admin-login-note">
             Accès réservé à l’équipe d’administration.

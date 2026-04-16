@@ -1,11 +1,15 @@
 @php
   $siteName = (string) config('site.name', '');
-  $seatAddress = trim((string) config('site.address', ''));
-  $seatDisplay = $seatAddress !== '' ? $seatAddress : __('pdf.donation_act.address_placeholder');
+  $legalFullName = trim((string) config('site.legal.full_name', ''));
+  $companyNumber = trim((string) config('site.legal.company_number', ''));
+  $mainAddress = trim((string) config('site.legal.main_address', ''));
+  $seatDisplay = $mainAddress !== '' ? $mainAddress : __('pdf.donation_act.address_placeholder');
   $feesAmount = number_format((float) ($funding->administrative_fees ?? \App\Models\FundingRequest::ADMINISTRATIVE_FEES), 2, ',', ' ');
   $directorName = $donationActMeta['director_name'] ?? __('pdf.donation_act.director_name_default');
   $directorTitle = $donationActMeta['director_title'] ?? __('pdf.donation_act.director_title_default');
   $beneficiaryName = $funding->full_name ?? __('pdf.donation_act.beneficiary_fallback');
+  $generatedDate = optional($funding->donation_act_generated_at)->format('d/m/Y') ?: now()->format('d/m/Y');
+  $brandColor = \App\Support\SiteAppearance::primaryColor();
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -24,13 +28,13 @@
       font-size: 16pt;
       text-align: center;
       margin: 8px 0 20px;
-      color: #0f6b57;
+      color: {{ $brandColor }};
     }
 
     h2 {
       font-size: 12.5pt;
       margin: 18px 0 8px;
-      color: #0f6b57;
+      color: {{ $brandColor }};
     }
 
     .meta {
@@ -50,7 +54,7 @@
     .brand-text {
       font-size: 18pt;
       font-weight: 700;
-      color: #0f6b57;
+      color: {{ $brandColor }};
       letter-spacing: .4px;
     }
 
@@ -62,6 +66,20 @@
     .sign-grid {
       width: 100%;
       margin-top: 16px;
+    }
+
+    .certification-badge {
+      display: block;
+      margin: 12px auto 0;
+      max-width: 120px;
+      max-height: 120px;
+    }
+
+    .certification-note {
+      margin-top: 8px;
+      text-align: center;
+      font-size: 10pt;
+      color: #333;
     }
 
     .sign-cell {
@@ -87,6 +105,31 @@
       margin-top: 8px;
       max-height: 60px;
       max-width: 220px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .sign-stack {
+      position: relative;
+      min-height: 110px;
+      margin-top: 8px;
+    }
+
+    .sign-watermark {
+      position: absolute;
+      left: 110px;
+      top: 26px;
+      max-width: 150px;
+      max-height: 52px;
+      opacity: .18;
+      filter: grayscale(100%);
+      z-index: 1;
+    }
+
+    .sign-stack .line {
+      position: relative;
+      z-index: 2;
+      margin-top: 34px;
     }
 
     .muted {
@@ -127,13 +170,18 @@
 
   <p>
     <strong>{{ $siteName }}</strong><br>
-    {{ $siteName }}<br>
-    {{ __('pdf.donation_act.seat') }} {{ $seatDisplay }}<br>
+    @if($legalFullName !== '')
+    {{ __('pdf.donation_act.legal_full_name') }} {{ $legalFullName }}<br>
+    @endif
+    {{ __('pdf.donation_act.non_profit_label') }}<br><br>
+    @if($companyNumber !== '')
+    {{ __('pdf.donation_act.company_number') }} {{ $companyNumber }}<br>
+    @endif
+    {{ __('pdf.donation_act.main_address') }} {{ $seatDisplay }}<br><br>
     {{ __('pdf.donation_act.represented_by') }} {{ $directorName }}<br>
-    {{ $directorTitle }}
+    {{ __('pdf.donation_act.acting_as') }} {{ $directorTitle }}<br><br>
+    {{ __('pdf.donation_act.hereinafter_org') }}
   </p>
-
-  <p>{{ __('pdf.donation_act.hereinafter_f', ['name' => $siteName]) }}</p>
 
   <p><strong>{{ __('pdf.donation_act.and') }}</strong></p>
 
@@ -206,7 +254,11 @@
 
   <div class="separator"></div>
 
-  <p><strong>{{ __('pdf.donation_act.certification_p1', ['date' => now()->format('d/m/Y'), 'site' => $siteName]) }} {{ __('pdf.donation_act.certification_p2', ['site' => $siteName]) }}</strong></p>
+  <p><strong>{{ __('pdf.donation_act.certification_p1', ['date' => $generatedDate, 'site' => $siteName]) }} {{ __('pdf.donation_act.certification_p2', ['site' => $siteName]) }}</strong></p>
+  @if (! empty($donationActMeta['certification_badge_data_uri']))
+  <img class="certification-badge" src="{{ $donationActMeta['certification_badge_data_uri'] }}" alt="EIG Certified">
+  <p class="certification-note">ONG honorée par EIG Certified</p>
+  @endif
 
   <div class="separator"></div>
 
@@ -214,11 +266,16 @@
     <tr>
       <td class="sign-cell">
         <p><strong>{{ __('pdf.donation_act.signature_of', ['site' => $siteName]) }}</strong></p>
-        @if (! empty($donationActMeta['director_signature_data_uri']))
-        <img class="sign-image" src="{{ $donationActMeta['director_signature_data_uri'] }}" alt="{{ __('pdf.donation_act.signature_dir_alt') }}">
-        @else
-        <span class="line"></span>
-        @endif
+        <div class="sign-stack">
+          @if (! empty($donationActMeta['logo_data_uri']))
+          <img class="sign-watermark" src="{{ $donationActMeta['logo_data_uri'] }}" alt="{{ __('pdf.donation_act.logo_alt') }}">
+          @endif
+          @if (! empty($donationActMeta['director_signature_data_uri']))
+          <img class="sign-image" src="{{ $donationActMeta['director_signature_data_uri'] }}" alt="{{ __('pdf.donation_act.signature_dir_alt') }}">
+          @else
+          <span class="line"></span>
+          @endif
+        </div>
         <div class="sign-name">
           <strong>{{ $directorName }}</strong><br>
         </div>

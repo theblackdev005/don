@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'common' => [
+        'loading' => 'Wird geladen…',
+        'processing' => 'Wird bearbeitet…',
+        'submitting' => 'Wird gesendet…',
+    ],
     'nav' => [
         'home' => 'Startseite',
         'about' => 'Über uns',
@@ -18,6 +23,7 @@ return [
     'lang' => [
         'label' => 'Sprache',
         'fr' => 'Français',
+        'en' => 'English',
         'es' => 'Español',
         'pt' => 'Português',
         'it' => 'Italiano',
@@ -40,5 +46,12 @@ return [
         'contact_us' => 'Kontakt',
         'funding_request' => 'Finanzierungsantrag',
         'tracking' => 'Vorgangsstatus',
+        'navigation' => 'Navigation',
+        'discover' => 'Entdecken',
+        'certification_label' => 'NGO ausgezeichnet von EIG Certified',
+        'marketing_about' => 'Gemeinnützige Organisation, die sich der direkten finanziellen Unterstützung von Menschen in schwierigen Lebenslagen widmet.',
+        'marketing_values' => 'Engagement - Transparenz - Wirkung',
+        'address_fallback' => 'Adresse der Website',
+        'legal_number' => 'Rechtsnummer:',
     ],
 ];

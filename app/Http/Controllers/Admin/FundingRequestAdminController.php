@@ -7,6 +7,7 @@ use App\Mail\FundingDonationActSentAdminMail;
 use App\Mail\FundingDonationActMail;
 use App\Mail\FundingPreliminaryAcceptedMail;
 use App\Mail\FundingPreliminarySentAdminMail;
+use App\Mail\FundingRequestClosedMail;
 use App\Mail\FundingRequestRefusedMail;
 use App\Models\FundingRequest;
 use App\Services\DonationActPdfService;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response as ResponseFactory;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 class FundingRequestAdminController extends Controller
 {
@@ -176,9 +178,17 @@ class FundingRequestAdminController extends Controller
             return back()->withErrors(['flow' => 'Cette action n’est possible que pour un dossier en attente initiale.']);
         }
 
-        Mail::to($fundingRequest->email)->send(
-            (new FundingPreliminaryAcceptedMail($fundingRequest))->locale($fundingRequest->preferredLocale())
-        );
+        try {
+            Mail::to($fundingRequest->email)->send(
+                (new FundingPreliminaryAcceptedMail($fundingRequest))->locale($fundingRequest->preferredLocale())
+            );
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return back()->withErrors([
+                'mail' => 'Impossible d’envoyer l’e-mail au demandeur. Vérifiez la configuration SMTP dans l’admin. Détail : '.$exception->getMessage(),
+            ]);
+        }
 
         // Le statut doit évoluer dès que le demandeur a reçu l’e-mail.
         // On ne bloque pas cette transition si la copie admin échoue.
@@ -191,7 +201,7 @@ class FundingRequestAdminController extends Controller
             try {
                 Mail::to($adminEmail)->send(
                     (new FundingPreliminarySentAdminMail($fundingRequest->fresh()))
-                        ->locale(config('locales.default', 'fr'))
+                        ->locale('fr')
                 );
                 $adminNotified = true;
             } catch (\Throwable $e) {
@@ -246,17 +256,30 @@ class FundingRequestAdminController extends Controller
         $path = $pdf->generateAndStore($fundingRequest, $locale);
         $fundingRequest->donation_act_path = $path;
         $fundingRequest->status = FundingRequest::STATUS_DONATION_ACT_SENT;
+        $fundingRequest->donation_act_generated_at = now();
         $fundingRequest->save();
 
-        Mail::to($fundingRequest->email)->send(
-            (new FundingDonationActMail($fundingRequest->fresh()))->locale($fundingRequest->preferredLocale())
-        );
+        try {
+            Mail::to($fundingRequest->email)->send(
+                (new FundingDonationActMail($fundingRequest->fresh()))->locale($fundingRequest->preferredLocale())
+            );
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return back()->withErrors([
+                'mail' => 'Le document a été généré, mais l’e-mail au client a échoué. Vérifiez le SMTP puis réessayez. Détail : '.$exception->getMessage(),
+            ]);
+        }
         $adminEmail = config('admin.notification_email');
         if ($adminEmail) {
-            Mail::to($adminEmail)->send(
-                (new FundingDonationActSentAdminMail($fundingRequest->fresh()))
-                    ->locale(config('locales.default', 'fr'))
-            );
+            try {
+                Mail::to($adminEmail)->send(
+                    (new FundingDonationActSentAdminMail($fundingRequest->fresh()))
+                        ->locale('fr')
+                );
+            } catch (Throwable $exception) {
+                report($exception);
+            }
         }
 
         return back()->with('ok', 'Don accordé : le document a été généré et envoyé au client'.($adminEmail ? ' et la notification interne a bien été transmise.' : '.'));
@@ -279,9 +302,17 @@ class FundingRequestAdminController extends Controller
         ]);
 
         $fundingRequest->refused_reason = trim((string) request('refused_reason'));
-        Mail::to($fundingRequest->email)->send(
-            (new FundingRequestRefusedMail($fundingRequest))->locale($fundingRequest->preferredLocale())
-        );
+        try {
+            Mail::to($fundingRequest->email)->send(
+                (new FundingRequestRefusedMail($fundingRequest))->locale($fundingRequest->preferredLocale())
+            );
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return back()->withErrors([
+                'mail' => 'Le refus n’a pas pu être envoyé par e-mail. Vérifiez le SMTP puis réessayez. Détail : '.$exception->getMessage(),
+            ]);
+        }
 
         $fundingRequest->status = FundingRequest::STATUS_REFUSED;
         $fundingRequest->save();
@@ -388,9 +419,28 @@ class FundingRequestAdminController extends Controller
 
     public function close(string $locale, FundingRequest $fundingRequest)
     {
+        if (in_array($fundingRequest->status, [
+            FundingRequest::STATUS_REFUSED,
+            FundingRequest::STATUS_CLOSED,
+        ], true)) {
+            return back()->withErrors(['flow' => 'Ce dossier ne peut pas être clôturé dans son état actuel.']);
+        }
+
         $fundingRequest->status = FundingRequest::STATUS_CLOSED;
         $fundingRequest->save();
 
-        return back()->with('ok', 'Dossier marqué comme clôturé (acte signé reçu ou processus terminé).');
+        try {
+            Mail::to($fundingRequest->email)->send(
+                (new FundingRequestClosedMail($fundingRequest->fresh()))->locale($fundingRequest->preferredLocale())
+            );
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return back()->withErrors([
+                'mail' => 'Le dossier a été clôturé, mais l’e-mail client a échoué. Vérifiez le SMTP puis réessayez. Détail : '.$exception->getMessage(),
+            ]);
+        }
+
+        return back()->with('ok', 'Dossier marqué comme clôturé et client informé par e-mail.');
     }
 }

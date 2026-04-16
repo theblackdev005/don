@@ -3,47 +3,15 @@
 namespace App\Services;
 
 use App\Models\FundingRequest;
+use App\Support\SiteAppearance;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\Storage;
 
 class DonationActPdfService
 {
-    public function generateAndStore(FundingRequest $funding, ?string $locale = null): string
+    public function renderHtml(FundingRequest $funding, ?string $locale = null): string
     {
-        $logoDataUri = null;
-        $signatureDataUri = null;
-
-        $relativeLogoPath = trim((string) config('admin.donation_act.logo_path', ''), '/');
-        if ($relativeLogoPath !== '') {
-            $absoluteLogoPath = public_path($relativeLogoPath);
-            if (is_file($absoluteLogoPath) && is_readable($absoluteLogoPath)) {
-                $ext = strtolower(pathinfo($absoluteLogoPath, PATHINFO_EXTENSION));
-                $mime = match ($ext) {
-                    'jpg', 'jpeg' => 'image/jpeg',
-                    'gif' => 'image/gif',
-                    'webp' => 'image/webp',
-                    default => 'image/png',
-                };
-                $logoDataUri = 'data:'.$mime.';base64,'.base64_encode((string) file_get_contents($absoluteLogoPath));
-            }
-        }
-
-        $relativeSignaturePath = trim((string) config('admin.donation_act.director_signature_path', ''), '/');
-        if ($relativeSignaturePath !== '') {
-            $absoluteSignaturePath = public_path($relativeSignaturePath);
-            if (is_file($absoluteSignaturePath) && is_readable($absoluteSignaturePath)) {
-                $ext = strtolower(pathinfo($absoluteSignaturePath, PATHINFO_EXTENSION));
-                $mime = match ($ext) {
-                    'jpg', 'jpeg' => 'image/jpeg',
-                    'gif' => 'image/gif',
-                    'webp' => 'image/webp',
-                    default => 'image/png',
-                };
-                $signatureDataUri = 'data:'.$mime.';base64,'.base64_encode((string) file_get_contents($absoluteSignaturePath));
-            }
-        }
-
         $supported = config('locales.supported', ['fr']);
         $resolvedLocale = $locale !== null && in_array($locale, $supported, true)
             ? $locale
@@ -55,23 +23,25 @@ class DonationActPdfService
             if ($directorName === '') {
                 $directorName = __('pdf.donation_act.director_name_default');
             }
-            $directorTitle = trim((string) config('admin.donation_act.director_title', ''));
-            if ($directorTitle === '') {
-                $directorTitle = __('pdf.donation_act.director_title_default');
-            }
+            $directorGender = (string) config('admin.donation_act.director_gender', 'male');
+            $directorTitle = $directorGender === 'female'
+                ? __('pdf.donation_act.director_title_female')
+                : __('pdf.donation_act.director_title_male');
 
             $html = view('pdfs.donation-act', [
                 'funding' => $funding,
-                'donationActMeta' => [
-                    'logo_data_uri' => $logoDataUri,
-                    'director_name' => $directorName,
-                    'director_title' => $directorTitle,
-                    'director_signature_data_uri' => $signatureDataUri,
-                ],
+                'donationActMeta' => $this->buildDonationActMeta($directorName, $directorTitle),
             ])->render();
         } finally {
             app()->setLocale($previousLocale);
         }
+
+        return $html;
+    }
+
+    public function generateAndStore(FundingRequest $funding, ?string $locale = null): string
+    {
+        $html = $this->renderHtml($funding, $locale);
 
         $options = new Options();
         $options->set('defaultFont', 'DejaVu Sans');
@@ -86,5 +56,55 @@ class DonationActPdfService
         Storage::disk('local')->put($path, $dompdf->output());
 
         return $path;
+    }
+
+    private function buildDonationActMeta(string $directorName, string $directorTitle): array
+    {
+        $logoDataUri = null;
+        $signatureDataUri = null;
+        $certificationBadgeDataUri = null;
+
+        $relativeLogoPath = trim((string) config('admin.donation_act.logo_path', ''), '/');
+        if ($relativeLogoPath === '') {
+            $relativeLogoPath = SiteAppearance::logoPath();
+        }
+        if ($relativeLogoPath !== '') {
+            $logoDataUri = $this->imageDataUriFromPublicPath($relativeLogoPath);
+        }
+
+        $relativeSignaturePath = trim((string) config('admin.donation_act.director_signature_path', ''), '/');
+        if ($relativeSignaturePath !== '') {
+            $signatureDataUri = $this->imageDataUriFromPublicPath($relativeSignaturePath);
+        }
+
+        $certificationBadgePath = 'assets/img/certifications/eig-certified.png';
+        $certificationBadgeDataUri = $this->imageDataUriFromPublicPath($certificationBadgePath);
+
+        return [
+            'logo_data_uri' => $logoDataUri,
+            'director_name' => $directorName,
+            'director_title' => $directorTitle,
+            'director_signature_data_uri' => $signatureDataUri,
+            'certification_badge_path' => $certificationBadgePath,
+            'certification_badge_data_uri' => $certificationBadgeDataUri,
+        ];
+    }
+
+    private function imageDataUriFromPublicPath(string $relativePath): ?string
+    {
+        $absolutePath = public_path(trim($relativePath, '/'));
+        if (! is_file($absolutePath) || ! is_readable($absolutePath)) {
+            return null;
+        }
+
+        $ext = strtolower(pathinfo($absolutePath, PATHINFO_EXTENSION));
+        $mime = match ($ext) {
+            'jpg', 'jpeg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp',
+            default => 'image/png',
+        };
+
+        return 'data:'.$mime.';base64,'.base64_encode((string) file_get_contents($absolutePath));
     }
 }

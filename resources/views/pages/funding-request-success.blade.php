@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', config('site.name').' | '.__('pages.funding_success.title'))
+@section('title', __('pages.funding_success.title'))
 
 @push('meta')
   @include('partials.meta-default')
@@ -15,16 +15,20 @@
 
   $baseKey = $ctx === 'documents' ? 'pages.documents_success' : 'pages.funding_success';
   $pageLocale = request()->route('locale') ?? app()->getLocale();
-  $rawPhone = (string) config('site.phone', '');
-  $whatsAppPhone = preg_replace('/\D+/', '', $rawPhone);
   $rawName = trim((string) ($applicant_name ?? ''));
   $firstName = $rawName !== '' ? (preg_split('/\s+/u', $rawName, 2)[0] ?? $rawName) : '';
   $displayTitle = __($baseKey.'.heading').($firstName !== '' ? ' '.$firstName : '');
-  $whatsAppMessage = __($baseKey.'.contact_body');
-  $whatsAppUrl = $whatsAppPhone
-      ? 'https://wa.me/'.$whatsAppPhone.'?text='.rawurlencode($whatsAppMessage)
-      : null;
-  $folderUrl = route('funding.tracking', ['locale' => $pageLocale]);
+  $whatsAppContext = $ctx === 'funding' && $rawName !== ''
+      ? 'funding'
+      : 'direct';
+  $whatsAppConfig = \App\Support\WhatsAppMessage::config(
+      $whatsAppContext,
+      ['name' => $firstName !== '' ? $firstName : $rawName],
+      $pageLocale,
+      (string) (request()->route('public_slug') ?? $dossier_number ?? $rawName)
+  );
+  $whatsAppUrl = $whatsAppConfig['url'] ?? null;
+  $folderUrl = \App\Support\LocalizedRouteSlugs::route('funding.tracking', ['locale' => $pageLocale]);
 @endphp
 
 <style>
@@ -289,7 +293,7 @@
         </div>
 
         <h1 class="thanks-title">{{ $displayTitle }}</h1>
-        <p class="thanks-copy-hero">{{ __($baseKey.'.lead') }}</p>
+        <p class="thanks-copy-hero">{!! __($baseKey.'.lead') !!}</p>
       </div>
 
       <div class="thanks-panel">
@@ -308,7 +312,7 @@
 
         <div class="thanks-actions">
           @if ($whatsAppUrl)
-            <a class="thanks-btn thanks-btn-primary" href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer">
+            <a class="thanks-btn thanks-btn-primary" href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" data-whatsapp-prefill='@json($whatsAppConfig)'>
               {{ __($baseKey.'.contact_cta') }}
             </a>
           @endif
@@ -322,5 +326,5 @@
   </div>
 </main>
 
-@include('partials.footers.compact')
+@include('partials.footers.marketing')
 @endsection

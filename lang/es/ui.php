@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'common' => [
+        'loading' => 'Cargando…',
+        'processing' => 'En curso…',
+        'submitting' => 'Enviando…',
+    ],
     'nav' => [
         'home' => 'Inicio',
         'about' => 'Acerca de',
@@ -18,6 +23,7 @@ return [
     'lang' => [
         'label' => 'Idioma',
         'fr' => 'Français',
+        'en' => 'English',
         'es' => 'Español',
         'pt' => 'Português',
         'it' => 'Italiano',
@@ -40,5 +46,12 @@ return [
         'contact_us' => 'Contáctenos',
         'funding_request' => 'Solicitud de financiación',
         'tracking' => 'Seguimiento de expediente',
+        'navigation' => 'Navegación',
+        'discover' => 'Descubrir',
+        'certification_label' => 'ONG reconocida por EIG Certified',
+        'marketing_about' => 'Organización sin ánimo de lucro dedicada a financiar directamente a personas en situación de vulnerabilidad.',
+        'marketing_values' => 'Compromiso - Transparencia - Impacto',
+        'address_fallback' => 'Dirección del sitio',
+        'legal_number' => 'N.° legal:',
     ],
 ];

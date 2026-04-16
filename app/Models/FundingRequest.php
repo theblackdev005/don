@@ -130,6 +130,7 @@ class FundingRequest extends Model
         'administrative_fees',
         'declare_accurate',
         'status',
+        'donation_act_generated_at',
         'admin_notes',
         'refused_reason',
         'donation_act_path',
@@ -139,6 +140,7 @@ class FundingRequest extends Model
         'amount_requested' => 'decimal:2',
         'administrative_fees' => 'decimal:2',
         'declare_accurate' => 'boolean',
+        'donation_act_generated_at' => 'datetime',
     ];
 
     public static function statusLabels(): array

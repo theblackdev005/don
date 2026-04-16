@@ -11,7 +11,8 @@
 @endsection
 
 @section('content')
-<p style="margin:0 0 18px;font-size:17px;font-weight:600;color:#0f6b57;">
+@php($brand = \App\Support\SiteAppearance::primaryColor())
+<p style="margin:0 0 18px;font-size:17px;font-weight:600;color:{{ $brand }};">
   {{ __('mail.received_admin.intro') }}
 </p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 20px;background-color:#f7faf9;border-radius:10px;border:1px solid #dfe9e6;">
@@ -20,7 +21,7 @@
       <ul style="margin:0;padding-left:18px;">
         <li style="margin:0 0 8px;"><strong>{{ __('mail.received_admin.li_dossier') }}</strong> {{ $fundingRequest->dossier_number }}</li>
         <li style="margin:0 0 8px;"><strong>{{ __('mail.received_admin.li_name') }}</strong> {{ $fundingRequest->full_name }}</li>
-        <li style="margin:0 0 8px;"><strong>{{ __('mail.received_admin.li_email') }}</strong> <a href="mailto:{{ $fundingRequest->email }}" style="color:#0f6b57;">{{ $fundingRequest->email }}</a></li>
+        <li style="margin:0 0 8px;"><strong>{{ __('mail.received_admin.li_email') }}</strong> <a href="mailto:{{ $fundingRequest->email }}" style="color:{{ $brand }};">{{ $fundingRequest->email }}</a></li>
         <li style="margin:0 0 8px;"><strong>{{ __('mail.received_admin.li_phone') }}</strong> {{ $fundingRequest->phone ?? __('mail.received_admin.dash') }}</li>
         @if($fundingRequest->country)
         <li style="margin:0 0 8px;"><strong>{{ __('mail.received_admin.li_country') }}</strong> {{ $fundingRequest->country }}</li>

@@ -1,6 +1,6 @@
 <?php
 
-return [
+return array_replace_recursive(require __DIR__.'/../en/funding.php', [
     'meta_title' => 'Richiesta di aiuto finanziario',
     'breadcrumb_current' => 'Richiesta di aiuto finanziario',
     'heading' => 'Richiesta di aiuto finanziario',
@@ -133,4 +133,4 @@ return [
             'body' => 'La pratica è registrata. Per maggiori informazioni usate i recapiti ricevuti via e-mail.',
         ],
     ],
-];
+]);

@@ -6,12 +6,12 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
 
-  <title>@yield('title', config('site.name'))</title>
+  <title>{{ config('site.name') }} | {{ __('funding.meta_title') }}</title>
   @stack('meta')
 
   <link rel="manifest" href="/manifest.json">
-  <link rel="icon" type="image/png" href="/assets/app-icons/icon-32x32.png" sizes="32x32">
-  <link rel="apple-touch-icon" href="/assets/app-icons/icon-180x180.png">
+  <link rel="icon" href="{{ \App\Support\SiteAppearance::faviconUrl() }}">
+  <link rel="apple-touch-icon" href="{{ \App\Support\SiteAppearance::faviconUrl() }}">
 
   <script src="/assets/js/theme-switcher.js"></script>
 
@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="/assets/icons/around-icons.min.css">
   <link rel="stylesheet" media="screen" href="/assets/css/theme.min.css">
 
+  @include('partials.site-tracking-head')
   @include('partials.preloader-head')
   @stack('head')
 </head>
