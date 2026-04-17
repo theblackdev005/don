@@ -112,10 +112,10 @@ class SiteSettingsController extends Controller
 
         $siteLogoPath = $request->hasFile('site_logo')
             ? $this->storeSiteLogo($request)
-            : (string) config('site.brand.logo_path', 'assets/img/branding/humanity-impact.png');
+            : (string) config('site.brand.logo_path', 'assets/img/branding/custom/site-logo.png');
         $siteFaviconPath = $request->hasFile('site_favicon')
             ? $this->storeSiteFavicon($request)
-            : (string) config('site.brand.favicon_path', 'assets/app-icons/icon-32x32.png');
+            : (string) config('site.brand.favicon_path', 'assets/app-icons/custom/site-favicon.png');
         $siteEmail = trim((string) ($validated['site_email'] ?? ''));
         $sitePhone = trim((string) ($validated['site_phone'] ?? ''));
 
@@ -256,7 +256,7 @@ class SiteSettingsController extends Controller
     {
         $logo = $request->file('site_logo');
         if (! $logo) {
-            return (string) config('site.brand.logo_path', 'assets/img/branding/humanity-impact.png');
+            return (string) config('site.brand.logo_path', 'assets/img/branding/custom/site-logo.png');
         }
 
         $extension = strtolower((string) $logo->getClientOriginalExtension());
@@ -282,7 +282,7 @@ class SiteSettingsController extends Controller
     {
         $favicon = $request->file('site_favicon');
         if (! $favicon) {
-            return (string) config('site.brand.favicon_path', 'assets/app-icons/icon-32x32.png');
+            return (string) config('site.brand.favicon_path', 'assets/app-icons/custom/site-favicon.png');
         }
 
         $extension = strtolower((string) $favicon->getClientOriginalExtension());

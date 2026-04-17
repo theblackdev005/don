@@ -40,7 +40,7 @@ class SiteAppearance
     {
         $path = trim((string) config('site.brand.logo_path', ''), '/');
 
-        return $path !== '' ? $path : 'assets/img/branding/humanity-impact.png';
+        return $path !== '' ? $path : 'assets/img/branding/custom/site-logo.png';
     }
 
     public static function logoUrl(): string
@@ -57,7 +57,7 @@ class SiteAppearance
     {
         $path = trim((string) config('site.brand.favicon_path', ''), '/');
 
-        return $path !== '' ? $path : 'assets/app-icons/icon-32x32.png';
+        return $path !== '' ? $path : 'assets/app-icons/custom/site-favicon.png';
     }
 
     public static function faviconUrl(): string

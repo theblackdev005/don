@@ -79,7 +79,7 @@
           </div>
           <div class="col-md-6">
             <label class="form-label">Domaine EHLO</label>
-            <input type="text" name="mail_ehlo_domain" class="form-control" value="{{ old('mail_ehlo_domain', $settings['mail_ehlo_domain']) }}" placeholder="hiafoundation.org">
+            <input type="text" name="mail_ehlo_domain" class="form-control" value="{{ old('mail_ehlo_domain', $settings['mail_ehlo_domain']) }}" placeholder="theavenfoundation.org">
           </div>
           <div class="col-md-6">
             <label class="form-label">Nom d'utilisateur</label>

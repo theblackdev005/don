@@ -4,7 +4,7 @@
   $linkedinUrl = trim((string) config('site.social.linkedin', ''));
   $siteAddress = trim((string) config('site.address', ''));
   $companyNumber = trim((string) config('site.legal.company_number', ''));
-  $publicContactEmail = trim((string) config('site.public_contact_email', 'contact@hiafoundation.org'));
+  $publicContactEmail = trim((string) config('site.public_contact_email', 'contact@example.com'));
   $pageLocale = request()->route('locale') ?? app()->getLocale();
   $whatsAppConfig = \App\Support\WhatsAppMessage::config('direct', ['site' => config('site.name')], $pageLocale, (string) request()->path());
   $whatsAppUrl = $whatsAppConfig['url'] ?? null;

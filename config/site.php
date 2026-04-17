@@ -12,8 +12,8 @@ return [
     'tagline' => env('SITE_TAGLINE', ''),
 
     'brand' => [
-        'logo_path' => trim((string) env('SITE_LOGO_PATH', 'assets/img/branding/humanity-impact.png'), '/'),
-        'favicon_path' => trim((string) env('SITE_FAVICON_PATH', 'assets/app-icons/icon-32x32.png'), '/'),
+        'logo_path' => trim((string) env('SITE_LOGO_PATH', 'assets/img/branding/custom/site-logo.png'), '/'),
+        'favicon_path' => trim((string) env('SITE_FAVICON_PATH', 'assets/app-icons/custom/site-favicon.png'), '/'),
     ],
 
     'labels' => [
@@ -86,27 +86,11 @@ return [
     */
     'offices' => [
         [
-            'label' => 'Orlando',
-            'phone' => '+178632256040',
-            'phone_display' => '+1 (786) 322 560 40',
-            'email' => 'orlando@example.com',
-            'address' => '514 S. Magnolia St. Orlando, FL 32806',
-            'map_url' => '#',
-        ],
-        [
-            'label' => 'Chicago',
-            'phone' => '+178632256040',
-            'phone_display' => '+1 (786) 322 560 40',
-            'email' => 'chicago@example.com',
-            'address' => '76, Industrial Dr, West Chicago, 60185',
-            'map_url' => '#',
-        ],
-        [
-            'label' => 'New York',
-            'phone' => '+178632256040',
-            'phone_display' => '+1 (786) 322 560 40',
-            'email' => 'newyork@example.com',
-            'address' => '396 Lillian Blvd, Holbrook, NY 11741',
+            'label' => env('SITE_NAME', env('APP_NAME', 'Foundation')),
+            'phone' => env('SITE_PHONE', ''),
+            'phone_display' => env('SITE_PHONE_DISPLAY', env('SITE_PHONE', '')),
+            'email' => env('SITE_EMAIL', 'contact@example.com'),
+            'address' => env('SITE_ADDRESS', ''),
             'map_url' => '#',
         ],
     ],
