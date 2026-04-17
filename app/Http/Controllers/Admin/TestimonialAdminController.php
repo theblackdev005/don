@@ -128,6 +128,8 @@ class TestimonialAdminController extends Controller
             'pt' => 'Portugais',
             'it' => 'Italien',
             'de' => 'Allemand',
+            'nl' => 'Neerlandais',
+            'fi' => 'Finnois',
         ];
 
         return collect($supportedLocales)

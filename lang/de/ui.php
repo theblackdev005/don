@@ -28,6 +28,8 @@ return [
         'pt' => 'Português',
         'it' => 'Italiano',
         'de' => 'Deutsch',
+        'nl' => 'Nederlands',
+        'fi' => 'Suomi',
     ],
     'footer' => [
         'about_text' => 'Solidarische Finanzhilfe für Menschen in Not – transparent und respektvoll.',

@@ -28,6 +28,8 @@ return [
         'pt' => 'Português',
         'it' => 'Italiano',
         'de' => 'Deutsch',
+        'nl' => 'Nederlands',
+        'fi' => 'Suomi',
     ],
     'footer' => [
         'about_text' => 'Accompagnement financier solidaire pour les personnes en situation difficile, avec transparence et respect de chaque dossier.',

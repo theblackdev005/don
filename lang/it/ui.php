@@ -28,6 +28,8 @@ return [
         'pt' => 'Português',
         'it' => 'Italiano',
         'de' => 'Deutsch',
+        'nl' => 'Nederlands',
+        'fi' => 'Suomi',
     ],
     'footer' => [
         'about_text' => 'Sostegno finanziario solidale per chi è in difficoltà, con trasparenza e rispetto per ogni pratica.',

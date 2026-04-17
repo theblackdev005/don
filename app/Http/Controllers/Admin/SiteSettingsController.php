@@ -55,6 +55,8 @@ class SiteSettingsController extends Controller
             'pt' => 'Portugais',
             'it' => 'Italien',
             'de' => 'Allemand',
+            'nl' => 'Neerlandais',
+            'fi' => 'Finnois',
         ];
 
         return view('admin.settings', [
