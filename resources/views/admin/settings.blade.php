@@ -126,7 +126,7 @@
           </div>
           <div class="col-md-6 d-flex align-items-end">
             <div class="admin-settings-helper w-100">
-              Le logo et le favicon sont publiés automatiquement sur le projet dès que vous enregistrez la configuration.
+              Le logo et le favicon sont mis a jour automatiquement.
             </div>
           </div>
           <div class="col-md-6">
@@ -193,6 +193,11 @@
             <label class="form-label">Facebook Pixel ID</label>
             <input type="text" name="site_facebook_pixel_id" class="form-control" value="{{ old('site_facebook_pixel_id', $settings['site_facebook_pixel_id']) }}" placeholder="123456789012345">
             <div class="form-text">Ajoutez uniquement l’identifiant du pixel Facebook.</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Meta Facebook domain verification</label>
+            <input type="text" name="site_facebook_domain_verification" class="form-control" value="{{ old('site_facebook_domain_verification', $settings['site_facebook_domain_verification']) }}" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+            <div class="form-text">Collez uniquement la valeur de verification fournie par Meta, pas toute la balise HTML.</div>
           </div>
         </div>
       </div>

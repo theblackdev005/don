@@ -24,6 +24,7 @@ return [
     'tracking' => [
         'google_tag_id' => trim((string) env('SITE_GOOGLE_TAG_ID', '')),
         'facebook_pixel_id' => trim((string) env('SITE_FACEBOOK_PIXEL_ID', '')),
+        'facebook_domain_verification' => trim((string) env('SITE_FACEBOOK_DOMAIN_VERIFICATION', '')),
     ],
 
     /*

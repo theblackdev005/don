@@ -4,10 +4,14 @@
   $metaKeywords = \App\Support\SiteMeta::keywords(app()->getLocale());
   $metaImage = \App\Support\SiteAppearance::logoUrl();
   $metaUrl = url()->full();
+  $facebookDomainVerification = trim((string) config('site.tracking.facebook_domain_verification', ''));
 @endphp
 <meta name="description" content="{{ $metaDescription }}">
 <meta name="keywords" content="{{ $metaKeywords }}">
 <link rel="canonical" href="{{ $metaUrl }}">
+@if ($facebookDomainVerification !== '')
+<meta name="facebook-domain-verification" content="{{ $facebookDomainVerification }}">
+@endif
 
 <meta property="og:type" content="website">
 <meta property="og:locale" content="{{ str_replace('-', '_', app()->getLocale()) }}">

@@ -210,6 +210,10 @@
                 <i class="ai-folder fs-lg opacity-70 me-2"></i>
                 Toutes les demandes
               </a>
+              <a class="dropdown-item" href="{{ route('admin.contacts.index') }}">
+                <i class="ai-user-group fs-lg opacity-70 me-2"></i>
+                Infos
+              </a>
               <a class="dropdown-item" href="{{ route('admin.settings.edit') }}">
                 <i class="ai-settings fs-lg opacity-70 me-2"></i>
                 Configuration
@@ -266,6 +270,10 @@
                   <a class="dropdown-item" href="{{ route('admin.funding-requests.index') }}">
                     <i class="ai-folder fs-lg opacity-70 me-2"></i>
                     Toutes les demandes
+                  </a>
+                  <a class="dropdown-item" href="{{ route('admin.contacts.index') }}">
+                    <i class="ai-user-group fs-lg opacity-70 me-2"></i>
+                    Infos
                   </a>
                   <a class="dropdown-item" href="{{ route('admin.settings.edit') }}">
                     <i class="ai-settings fs-lg opacity-70 me-2"></i>
@@ -328,6 +336,10 @@
                   <a class="admin-side-link fw-semibold {{ $navActive === 'demandes' ? 'active' : '' }}" href="{{ route('admin.funding-requests.index') }}">
                     <i class="ai-folder fs-5 opacity-60 me-2"></i>
                     Toutes les demandes
+                  </a>
+                  <a class="admin-side-link fw-semibold {{ $navActive === 'infos' ? 'active' : '' }}" href="{{ route('admin.contacts.index') }}">
+                    <i class="ai-user-group fs-5 opacity-60 me-2"></i>
+                    Infos
                   </a>
                   <a class="admin-side-link fw-semibold {{ $navActive === 'settings' ? 'active' : '' }}" href="{{ route('admin.settings.edit') }}">
                     <i class="ai-settings fs-5 opacity-60 me-2"></i>

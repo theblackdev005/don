@@ -7,6 +7,74 @@
   };
 @endphp
 
+@once
+  @push('head')
+    <style>
+      .site-mobile-menu-toggle {
+        width: 3.5rem;
+        height: 3.5rem;
+        padding: 0;
+        border: 1px solid rgba(31, 143, 107, 0.16);
+        border-radius: 1.2rem;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.06);
+      }
+
+      .site-mobile-menu-toggle:focus {
+        box-shadow: 0 0 0 .2rem rgba(31, 143, 107, 0.14), 0 14px 28px rgba(15, 23, 42, 0.06);
+      }
+
+      .site-mobile-menu-toggle-grid {
+        display: grid;
+        grid-template-columns: repeat(3, .45rem);
+        gap: .38rem;
+        justify-content: center;
+      }
+
+      .site-mobile-menu-toggle-dot {
+        width: .45rem;
+        height: .45rem;
+        border-radius: 999px;
+        background: #1f8f6b;
+        box-shadow: 0 2px 6px rgba(31, 143, 107, 0.16);
+        transition: transform .18s ease, opacity .18s ease;
+      }
+
+      .site-mobile-menu-toggle[aria-expanded="true"] .site-mobile-menu-toggle-dot:nth-child(2),
+      .site-mobile-menu-toggle[aria-expanded="true"] .site-mobile-menu-toggle-dot:nth-child(4),
+      .site-mobile-menu-toggle[aria-expanded="true"] .site-mobile-menu-toggle-dot:nth-child(6),
+      .site-mobile-menu-toggle[aria-expanded="true"] .site-mobile-menu-toggle-dot:nth-child(8) {
+        opacity: .55;
+        transform: scale(.85);
+      }
+
+      @media (min-width: 992px) {
+        .site-mobile-menu-toggle {
+          display: none;
+        }
+      }
+
+      @media (max-width: 575.98px) {
+        .site-mobile-menu-toggle {
+          width: 3.2rem;
+          height: 3.2rem;
+          border-radius: 1.05rem;
+        }
+
+        .site-mobile-menu-toggle-grid {
+          grid-template-columns: repeat(3, .4rem);
+          gap: .34rem;
+        }
+
+        .site-mobile-menu-toggle-dot {
+          width: .4rem;
+          height: .4rem;
+        }
+      }
+    </style>
+  @endpush
+@endonce
+
 @if ($variant === 'dark')
   <header data-bs-theme="dark">
     <div class="{{ $headerClass }}">
@@ -62,9 +130,19 @@
           </div>
         @endif
 
-        <button class="navbar-toggler ms-2 ms-sm-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        <button class="navbar-toggler site-mobile-menu-toggle ms-2 ms-sm-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
           aria-label="{{ __('ui.nav.admin_menu') }}">
-          <span class="navbar-toggler-icon"></span>
+          <span class="site-mobile-menu-toggle-grid" aria-hidden="true">
+            <span class="site-mobile-menu-toggle-dot"></span>
+            <span class="site-mobile-menu-toggle-dot"></span>
+            <span class="site-mobile-menu-toggle-dot"></span>
+            <span class="site-mobile-menu-toggle-dot"></span>
+            <span class="site-mobile-menu-toggle-dot"></span>
+            <span class="site-mobile-menu-toggle-dot"></span>
+            <span class="site-mobile-menu-toggle-dot"></span>
+            <span class="site-mobile-menu-toggle-dot"></span>
+            <span class="site-mobile-menu-toggle-dot"></span>
+          </span>
         </button>
 
         <nav class="collapse navbar-collapse" id="navbarNav">

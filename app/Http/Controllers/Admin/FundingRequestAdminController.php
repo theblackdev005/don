@@ -142,6 +142,67 @@ class FundingRequestAdminController extends Controller
         ]);
     }
 
+    public function contacts(string $locale, Request $request)
+    {
+        $contacts = FundingRequest::query()
+            ->selectRaw('MIN(id) as id, full_name, email, phone_prefix, phone, COUNT(*) as requests_count, MAX(created_at) as last_request_at')
+            ->where(function ($sub) {
+                $sub->where('full_name', '!=', '')
+                    ->orWhere('email', '!=', '')
+                    ->orWhere('phone', '!=', '');
+            });
+
+        $contacts = $contacts
+            ->groupBy('full_name', 'email', 'phone_prefix', 'phone')
+            ->orderByDesc('last_request_at')
+            ->paginate(25)
+            ->withQueryString();
+
+        return view('admin.contacts', [
+            'contacts' => $contacts,
+            'adminActive' => 'infos',
+        ]);
+    }
+
+    public function exportContacts(string $locale)
+    {
+        $contacts = FundingRequest::query()
+            ->selectRaw('full_name, email, phone_prefix, phone, MAX(created_at) as last_request_at')
+            ->where(function ($sub) {
+                $sub->where('full_name', '!=', '')
+                    ->orWhere('email', '!=', '')
+                    ->orWhere('phone', '!=', '');
+            })
+            ->groupBy('full_name', 'email', 'phone_prefix', 'phone')
+            ->orderBy('full_name')
+            ->get();
+
+        $filename = 'infos-contacts-'.now()->format('Y-m-d-His').'.csv';
+
+        return response()->streamDownload(function () use ($contacts) {
+            $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
+            fputcsv($handle, ['Nom complet', 'E-mail', 'Téléphone']);
+
+            foreach ($contacts as $contact) {
+                $phoneDisplay = trim(implode(' ', array_filter([
+                    trim((string) $contact->phone_prefix),
+                    trim((string) $contact->phone),
+                ])));
+
+                fputcsv($handle, [
+                    (string) ($contact->full_name ?: ''),
+                    (string) ($contact->email ?: ''),
+                    $phoneDisplay,
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
     public function show(string $locale, FundingRequest $fundingRequest)
     {
         if ($fundingRequest->documentsComplete() && in_array($fundingRequest->status, [

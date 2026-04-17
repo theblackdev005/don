@@ -130,7 +130,7 @@
       <form method="post" action="{{ route('admin.smtp.test') }}">
         @csrf
         <label class="form-label">Adresse de test</label>
-        <input type="email" name="test_email" class="form-control mb-3" value="{{ old('test_email', $settings['mail_from_address']) }}" placeholder="vous@domaine.org">
+        <input type="email" name="test_email" class="form-control mb-3" value="{{ old('test_email', '') }}" placeholder="vous@domaine.org">
         <button type="submit" class="btn btn-outline-primary w-100">
           <i class="ai-at me-2"></i>
           Envoyer un e-mail de test

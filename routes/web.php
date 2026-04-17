@@ -161,6 +161,8 @@ Route::prefix('{locale}')->whereIn('locale', $supportedLocales)->group(function 
                 ]);
             })->name('guide');
             Route::get('demandes', [FundingRequestAdminController::class, 'index'])->name('funding-requests.index');
+            Route::get('infos', [FundingRequestAdminController::class, 'contacts'])->name('contacts.index');
+            Route::get('infos/export', [FundingRequestAdminController::class, 'exportContacts'])->name('contacts.export');
             Route::get('demandes/{fundingRequest}', [FundingRequestAdminController::class, 'show'])->name('funding-requests.show');
             Route::post('demandes/{fundingRequest}/notes', [FundingRequestAdminController::class, 'updateNotes'])->name('funding-requests.notes');
             Route::post('demandes/{fundingRequest}/frais-administratifs', [FundingRequestAdminController::class, 'updateAdministrativeFees'])
