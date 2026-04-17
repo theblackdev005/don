@@ -45,7 +45,7 @@ class SiteAppearance
 
     public static function logoUrl(): string
     {
-        return asset(self::logoPath());
+        return self::versionedAssetUrl(self::logoPath());
     }
 
     public static function logoPublicPath(): string
@@ -62,7 +62,21 @@ class SiteAppearance
 
     public static function faviconUrl(): string
     {
-        return asset(self::faviconPath());
+        return self::versionedAssetUrl(self::faviconPath());
+    }
+
+    private static function versionedAssetUrl(string $path): string
+    {
+        $url = asset($path);
+        $publicPath = public_path($path);
+
+        if (! is_file($publicPath)) {
+            return $url;
+        }
+
+        $timestamp = @filemtime($publicPath);
+
+        return $timestamp ? $url.'?v='.$timestamp : $url;
     }
 
     private static function normalizeHex(string $value, string $fallback): string

@@ -12,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
 
 class SiteSettingsController extends Controller
@@ -259,23 +260,7 @@ class SiteSettingsController extends Controller
             return (string) config('site.brand.logo_path', 'assets/img/branding/custom/site-logo.png');
         }
 
-        $extension = strtolower((string) $logo->getClientOriginalExtension());
-        $fileName = 'site-logo'.($extension !== '' ? '.'.$extension : '');
-        $directory = public_path('assets/img/branding/custom');
-
-        if (! is_dir($directory)) {
-            File::ensureDirectoryExists($directory);
-        }
-
-        foreach (glob($directory.'/site-logo.*') ?: [] as $existingFile) {
-            if (is_file($existingFile)) {
-                @unlink($existingFile);
-            }
-        }
-
-        $logo->move($directory, $fileName);
-
-        return 'assets/img/branding/custom/'.$fileName;
+        return $this->storePublicAsset($request, $logo, 'assets/img/branding/custom', 'site-logo');
     }
 
     private function storeSiteFavicon(Request $request): string
@@ -285,22 +270,56 @@ class SiteSettingsController extends Controller
             return (string) config('site.brand.favicon_path', 'assets/app-icons/custom/site-favicon.png');
         }
 
-        $extension = strtolower((string) $favicon->getClientOriginalExtension());
-        $fileName = 'site-favicon'.($extension !== '' ? '.'.$extension : '');
-        $directory = public_path('assets/app-icons/custom');
+        return $this->storePublicAsset($request, $favicon, 'assets/app-icons/custom', 'site-favicon');
+    }
 
-        if (! is_dir($directory)) {
-            File::ensureDirectoryExists($directory);
-        }
+    private function storePublicAsset(Request $request, UploadedFile $file, string $relativeDirectory, string $basename): string
+    {
+        $extension = strtolower((string) $file->getClientOriginalExtension());
+        $fileName = $basename.($extension !== '' ? '.'.$extension : '');
+        $directories = $this->publicAssetDirectories($request, $relativeDirectory);
 
-        foreach (glob($directory.'/site-favicon.*') ?: [] as $existingFile) {
-            if (is_file($existingFile)) {
-                @unlink($existingFile);
+        foreach ($directories as $directory) {
+            if (! is_dir($directory)) {
+                File::ensureDirectoryExists($directory);
+            }
+
+            foreach (glob($directory.'/'.$basename.'.*') ?: [] as $existingFile) {
+                if (is_file($existingFile)) {
+                    @unlink($existingFile);
+                }
             }
         }
 
-        $favicon->move($directory, $fileName);
+        $primaryDirectory = $directories[0];
+        $file->move($primaryDirectory, $fileName);
 
-        return 'assets/app-icons/custom/'.$fileName;
+        $primaryFile = $primaryDirectory.'/'.$fileName;
+
+        foreach (array_slice($directories, 1) as $directory) {
+            File::copy($primaryFile, $directory.'/'.$fileName);
+        }
+
+        return trim($relativeDirectory, '/').'/'.$fileName;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function publicAssetDirectories(Request $request, string $relativeDirectory): array
+    {
+        $relativeDirectory = trim($relativeDirectory, '/');
+        $directories = [public_path($relativeDirectory)];
+        $documentRoot = trim((string) $request->server('DOCUMENT_ROOT', ''));
+
+        if ($documentRoot !== '') {
+            $documentRootDirectory = rtrim($documentRoot, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$relativeDirectory;
+
+            if (! in_array($documentRootDirectory, $directories, true)) {
+                $directories[] = $documentRootDirectory;
+            }
+        }
+
+        return $directories;
     }
 }
