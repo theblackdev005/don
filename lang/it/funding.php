@@ -9,10 +9,14 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
     'progress_aria' => 'Avanzamento del modulo',
     'steps_aria' => 'Passaggi del modulo',
     'step_label' => 'Passaggio :current di :total',
+    'step_badge' => 'Passaggio :number',
     'step1_title' => '1. Dati personali',
     'step2_title' => '2. Situazione del richiedente',
     'step3_title' => '3. Dettagli della richiesta',
     'step4_title' => '4. Dichiarazione',
+    'step1_note' => 'Indicate i vostri recapiti affinché il nostro team possa identificarvi e ricontattarvi se necessario.',
+    'step2_note' => 'Aiutateci a comprendere la vostra situazione attuale per esaminare correttamente la pratica.',
+    'step3_note' => 'Indicate l’importo richiesto e spiegate la vostra esigenza con informazioni chiare e semplici.',
     'first_name' => 'Nome',
     'last_name' => 'Cognome',
     'full_name' => 'Nome completo',
@@ -41,6 +45,8 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
     'invalid_address' => 'Indicate l’indirizzo completo.',
     'invalid_email' => 'È richiesto un indirizzo e-mail valido.',
     'invalid_phone' => 'Indicate il numero di telefono.',
+    'duplicate_email' => 'È già stata registrata una richiesta con questo indirizzo e-mail. È consentita una sola richiesta per persona.',
+    'duplicate_phone' => 'È già stata registrata una richiesta con questo numero di telefono. È consentita una sola richiesta per persona.',
     'legend_current_situation' => 'Situazione attuale',
     'monthly_income' => 'Reddito mensile approssimativo',
     'placeholder_income' => 'Es. 1.200 € netti, variabile…',
@@ -79,7 +85,7 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
         'other' => 'Altro',
     ],
     'family_situation' => [
-        'single' => 'Single',
+        'single' => 'Celibe / nubile',
         'married' => 'Sposato/a',
         'with_children' => 'Con figli',
     ],
@@ -96,6 +102,7 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
         'awaiting_documents' => 'In attesa dei documenti giustificativi',
         'documents_received' => 'Documenti ricevuti',
         'donation_act_sent' => 'Pratica convalidata — atto di donazione inviato',
+        'refused' => 'Rifiutata e archiviata',
         'closed' => 'Chiusa',
     ],
     'identity_doc' => [
@@ -123,6 +130,10 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
         'donation_act_sent' => [
             'headline' => 'Atto di donazione inviato',
             'body' => 'Vi è stato inviato per e-mail un atto di donazione (PDF). Consultatelo e seguite le istruzioni del vostro referente.',
+        ],
+        'refused' => [
+            'headline' => 'Richiesta non approvata',
+            'body' => 'Dopo aver esaminato la vostra pratica, non possiamo dare una risposta favorevole alla richiesta in questa fase. Se la vostra situazione cambia, il nostro team potrà ricontattarvi se necessario.',
         ],
         'closed' => [
             'headline' => 'Pratica chiusa',

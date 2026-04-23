@@ -45,6 +45,8 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
     'invalid_address' => 'Indique su dirección completa.',
     'invalid_email' => 'Se requiere un correo válido.',
     'invalid_phone' => 'Indique su número de teléfono.',
+    'duplicate_email' => 'Ya se ha registrado una solicitud con esta dirección de correo electrónico. Solo se permite una solicitud por persona.',
+    'duplicate_phone' => 'Ya se ha registrado una solicitud con este número de teléfono. Solo se permite una solicitud por persona.',
     'legend_current_situation' => 'Situación actual',
     'monthly_income' => 'Ingresos mensuales aproximados',
     'placeholder_income' => 'Ej. 1.200 € netos, variable…',
@@ -100,6 +102,7 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
         'awaiting_documents' => 'En espera de documentación',
         'documents_received' => 'Documentación recibida',
         'donation_act_sent' => 'Expediente validado — acta de donación enviada',
+        'refused' => 'Rechazada y archivada',
         'closed' => 'Cerrada',
     ],
     'identity_doc' => [
@@ -127,6 +130,10 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
         'donation_act_sent' => [
             'headline' => 'Acta de donación enviada',
             'body' => 'Se le ha enviado por correo un acta de donación (PDF). Consúltela y siga las instrucciones de su gestor.',
+        ],
+        'refused' => [
+            'headline' => 'Solicitud no aprobada',
+            'body' => 'Tras revisar su expediente, no podemos dar una respuesta favorable a su solicitud en esta etapa. Si su situación evoluciona, nuestro equipo podrá volver a contactarle si es necesario.',
         ],
         'closed' => [
             'headline' => 'Expediente cerrado',

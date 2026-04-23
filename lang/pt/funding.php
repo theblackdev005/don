@@ -9,10 +9,14 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
     'progress_aria' => 'Progresso do formulário',
     'steps_aria' => 'Etapas do formulário',
     'step_label' => 'Etapa :current de :total',
+    'step_badge' => 'Etapa :number',
     'step1_title' => '1. Dados pessoais',
     'step2_title' => '2. Situação do requerente',
     'step3_title' => '3. Detalhes do pedido',
     'step4_title' => '4. Declaração',
+    'step1_note' => 'Indique os seus dados de contacto para que a nossa equipa o possa identificar e voltar a contactá-lo se necessário.',
+    'step2_note' => 'Ajude-nos a compreender a sua situação atual para analisarmos corretamente o seu processo.',
+    'step3_note' => 'Indique o montante pedido e explique a sua necessidade com informações claras e simples.',
     'first_name' => 'Nome próprio',
     'last_name' => 'Apelido',
     'full_name' => 'Nome completo',
@@ -41,6 +45,8 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
     'invalid_address' => 'Indique a morada completa.',
     'invalid_email' => 'É necessário um e-mail válido.',
     'invalid_phone' => 'Indique o número de telefone.',
+    'duplicate_email' => 'Já foi registado um pedido com este endereço de e-mail. Só é permitido um pedido por pessoa.',
+    'duplicate_phone' => 'Já foi registado um pedido com este número de telefone. Só é permitido um pedido por pessoa.',
     'legend_current_situation' => 'Situação atual',
     'monthly_income' => 'Rendimento mensal aproximado',
     'placeholder_income' => 'Ex. 1 200 € líquidos, variável…',
@@ -96,6 +102,7 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
         'awaiting_documents' => 'À espera de documentos',
         'documents_received' => 'Documentos recebidos',
         'donation_act_sent' => 'Processo validado — ato de doação enviado',
+        'refused' => 'Recusado e arquivado',
         'closed' => 'Encerrada',
     ],
     'identity_doc' => [
@@ -123,6 +130,10 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
         'donation_act_sent' => [
             'headline' => 'Acto de doação enviado',
             'body' => 'Foi enviado por e-mail um acto de doação (PDF). Consulte-o e siga as instruções do seu gestor.',
+        ],
+        'refused' => [
+            'headline' => 'Pedido não aprovado',
+            'body' => 'Após análise do seu processo, não nos é possível dar uma resposta favorável ao seu pedido nesta fase. Se a sua situação evoluir, a nossa equipa poderá voltar a contactá-lo se necessário.',
         ],
         'closed' => [
             'headline' => 'Processo encerrado',
