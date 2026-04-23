@@ -292,6 +292,7 @@ class FundingRequestFlowTest extends TestCase
 
         $fundingRequest = FundingRequest::factory()->create([
             'status' => FundingRequest::STATUS_DOCUMENTS_RECEIVED,
+            'locale' => 'es',
             'doc_id_front_path' => 'funding-documents/front.jpg',
             'doc_id_back_path' => 'funding-documents/back.jpg',
             'doc_situation_path' => 'funding-documents/situation.pdf',
@@ -306,7 +307,7 @@ class FundingRequestFlowTest extends TestCase
             $mock->shouldReceive('generateAndStore')
                 ->once()
                 ->withArgs(function (FundingRequest $request, ?string $locale) use ($fundingRequest) {
-                    return $request->is($fundingRequest) && $locale === 'fr';
+                    return $request->is($fundingRequest) && $locale === 'es';
                 })
                 ->andReturn('donation-acts/test-act.pdf');
         });

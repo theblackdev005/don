@@ -314,7 +314,7 @@ class FundingRequestAdminController extends Controller
             return back()->withErrors(['flow' => 'Les pièces justificatives du demandeur doivent être reçues avant de générer l’acte de donation. Envoyez d’abord la validation préliminaire, puis attendez le dépôt des documents via le lien transmis au demandeur.']);
         }
 
-        $path = $pdf->generateAndStore($fundingRequest, $locale);
+        $path = $pdf->generateAndStore($fundingRequest, $fundingRequest->preferredLocale());
         $fundingRequest->donation_act_path = $path;
         $fundingRequest->status = FundingRequest::STATUS_DONATION_ACT_SENT;
         $fundingRequest->donation_act_generated_at = now();
