@@ -92,23 +92,12 @@ class DonationActPdfService
 
     private function imageDataUriFromPublicPath(string $relativePath): ?string
     {
-        $bestCandidate = null;
-        $bestCandidateTimestamp = -1;
-
         foreach ($this->publicAssetCandidates($relativePath) as $absolutePath) {
             if (! is_file($absolutePath) || ! is_readable($absolutePath)) {
                 continue;
             }
 
-            $timestamp = (int) (@filemtime($absolutePath) ?: 0);
-            if ($bestCandidate === null || $timestamp >= $bestCandidateTimestamp) {
-                $bestCandidate = $absolutePath;
-                $bestCandidateTimestamp = $timestamp;
-            }
-        }
-
-        if ($bestCandidate !== null) {
-            $ext = strtolower(pathinfo($bestCandidate, PATHINFO_EXTENSION));
+            $ext = strtolower(pathinfo($absolutePath, PATHINFO_EXTENSION));
             $mime = match ($ext) {
                 'jpg', 'jpeg' => 'image/jpeg',
                 'gif' => 'image/gif',
@@ -116,7 +105,7 @@ class DonationActPdfService
                 default => 'image/png',
             };
 
-            return 'data:'.$mime.';base64,'.base64_encode((string) file_get_contents($bestCandidate));
+            return 'data:'.$mime.';base64,'.base64_encode((string) file_get_contents($absolutePath));
         }
 
         return null;
@@ -128,15 +117,15 @@ class DonationActPdfService
     private function publicAssetCandidates(string $relativePath): array
     {
         $relativePath = trim($relativePath, '/');
-        $candidates = [
-            public_path($relativePath),
-            dirname(base_path()).DIRECTORY_SEPARATOR.$relativePath,
-        ];
+        $candidates = [];
 
         $documentRoot = trim((string) request()->server('DOCUMENT_ROOT', ''));
         if ($documentRoot !== '') {
             $candidates[] = rtrim($documentRoot, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$relativePath;
         }
+
+        $candidates[] = dirname(base_path()).DIRECTORY_SEPARATOR.$relativePath;
+        $candidates[] = public_path($relativePath);
 
         return array_values(array_unique($candidates));
     }
