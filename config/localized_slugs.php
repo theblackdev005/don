@@ -8,6 +8,8 @@ return [
         'pt' => 'sobre',
         'it' => 'chi-siamo',
         'de' => 'uber-uns',
+        'nl' => 'over-ons',
+        'fi' => 'tietoa-meista',
     ],
     'services' => [
         'fr' => trim((string) env('SITE_SLUG_SERVICES', 'services'), '/'),
@@ -16,6 +18,8 @@ return [
         'pt' => 'servicos',
         'it' => 'servizi',
         'de' => 'dienstleistungen',
+        'nl' => 'diensten',
+        'fi' => 'palvelut',
     ],
     'contact' => [
         'fr' => trim((string) env('SITE_SLUG_CONTACT', 'contact'), '/'),
@@ -24,6 +28,8 @@ return [
         'pt' => 'contato',
         'it' => 'contatto',
         'de' => 'kontakt',
+        'nl' => 'contact',
+        'fi' => 'yhteystiedot',
     ],
     'account' => [
         'fr' => trim((string) env('SITE_SLUG_ACCOUNT', 'compte'), '/'),
@@ -32,6 +38,8 @@ return [
         'pt' => 'conta',
         'it' => 'account',
         'de' => 'konto',
+        'nl' => 'account',
+        'fi' => 'tili',
     ],
     'funding_request' => [
         'fr' => trim((string) env('SITE_SLUG_FUNDING_REQUEST', 'demande-financement'), '/'),
@@ -40,6 +48,8 @@ return [
         'pt' => 'pedido-financiamento',
         'it' => 'richiesta-finanziamento',
         'de' => 'finanzierungsantrag',
+        'nl' => 'financieringsaanvraag',
+        'fi' => 'rahoitushakemus',
     ],
     'funding_request_confirmation' => [
         'fr' => trim((string) env('SITE_SLUG_FUNDING_CONFIRMATION', 'confirmation'), '/'),
@@ -48,6 +58,8 @@ return [
         'pt' => 'confirmacao',
         'it' => 'conferma',
         'de' => 'bestaetigung',
+        'nl' => 'bevestiging',
+        'fi' => 'vahvistus',
     ],
     'dossier_tracking' => [
         'fr' => trim((string) (env('SITE_SLUG_DOSSIER_TRACKING') ?: 'suivi-dossier'), '/'),
@@ -56,6 +68,8 @@ return [
         'pt' => 'acompanhamento-processo',
         'it' => 'tracciamento-pratica',
         'de' => 'antragsverfolgung',
+        'nl' => 'dossieropvolging',
+        'fi' => 'hakemuksen-seuranta',
     ],
     'legal' => [
         'fr' => trim((string) env('SITE_SLUG_LEGAL', 'mentions-legales'), '/'),
@@ -64,6 +78,8 @@ return [
         'pt' => 'informacoes-legais',
         'it' => 'note-legali',
         'de' => 'rechtliche-hinweise',
+        'nl' => 'juridische-vermeldingen',
+        'fi' => 'oikeudelliset-tiedot',
     ],
     'privacy' => [
         'fr' => trim((string) env('SITE_SLUG_PRIVACY', 'politique-de-confidentialite'), '/'),
@@ -72,5 +88,7 @@ return [
         'pt' => 'politica-de-privacidade',
         'it' => 'politica-sulla-riservatezza',
         'de' => 'datenschutzrichtlinie',
+        'nl' => 'privacybeleid',
+        'fi' => 'tietosuojakaytanto',
     ],
 ];
