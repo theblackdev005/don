@@ -11,6 +11,8 @@ return [
 
     'tagline' => env('SITE_TAGLINE', ''),
 
+    'public_url' => rtrim((string) env('SITE_PUBLIC_URL', env('APP_URL', 'http://localhost')), '/'),
+
     'brand' => [
         'logo_path' => trim((string) env('SITE_LOGO_PATH', 'assets/img/branding/custom/site-logo.png'), '/'),
         'favicon_path' => trim((string) env('SITE_FAVICON_PATH', 'assets/app-icons/custom/site-favicon.png'), '/'),
