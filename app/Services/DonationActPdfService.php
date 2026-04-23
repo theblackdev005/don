@@ -92,19 +92,41 @@ class DonationActPdfService
 
     private function imageDataUriFromPublicPath(string $relativePath): ?string
     {
-        $absolutePath = public_path(trim($relativePath, '/'));
-        if (! is_file($absolutePath) || ! is_readable($absolutePath)) {
-            return null;
+        foreach ($this->publicAssetCandidates($relativePath) as $absolutePath) {
+            if (! is_file($absolutePath) || ! is_readable($absolutePath)) {
+                continue;
+            }
+
+            $ext = strtolower(pathinfo($absolutePath, PATHINFO_EXTENSION));
+            $mime = match ($ext) {
+                'jpg', 'jpeg' => 'image/jpeg',
+                'gif' => 'image/gif',
+                'webp' => 'image/webp',
+                default => 'image/png',
+            };
+
+            return 'data:'.$mime.';base64,'.base64_encode((string) file_get_contents($absolutePath));
         }
 
-        $ext = strtolower(pathinfo($absolutePath, PATHINFO_EXTENSION));
-        $mime = match ($ext) {
-            'jpg', 'jpeg' => 'image/jpeg',
-            'gif' => 'image/gif',
-            'webp' => 'image/webp',
-            default => 'image/png',
-        };
+        return null;
+    }
 
-        return 'data:'.$mime.';base64,'.base64_encode((string) file_get_contents($absolutePath));
+    /**
+     * @return list<string>
+     */
+    private function publicAssetCandidates(string $relativePath): array
+    {
+        $relativePath = trim($relativePath, '/');
+        $candidates = [
+            public_path($relativePath),
+            dirname(base_path()).DIRECTORY_SEPARATOR.$relativePath,
+        ];
+
+        $documentRoot = trim((string) request()->server('DOCUMENT_ROOT', ''));
+        if ($documentRoot !== '') {
+            $candidates[] = rtrim($documentRoot, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$relativePath;
+        }
+
+        return array_values(array_unique($candidates));
     }
 }
