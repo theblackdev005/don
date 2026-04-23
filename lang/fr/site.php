@@ -2,7 +2,7 @@
 
 return [
     'whatsapp_floating' => [
-        'label' => 'WhatsApp',
+        'label' => 'Aide WhatsApp',
         'subtext' => 'Réponse rapide',
     ],
 ];

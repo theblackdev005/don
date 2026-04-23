@@ -6,7 +6,7 @@ return array_replace_recursive(require __DIR__.'/../en/mail.php', [
         'brand_fallback' => 'Offizielle Benachrichtigung',
         'notification_label' => 'Automatische Nachricht',
         'contact_email_label' => 'E-Mail: ',
-        'contact_whatsapp_label' => 'WhatsApp: ',
+        'contact_whatsapp_label' => 'WhatsApp-Hilfe: ',
         'copyright' => 'Alle Rechte vorbehalten.',
     ],
     'common' => [
@@ -99,6 +99,16 @@ return array_replace_recursive(require __DIR__.'/../en/mail.php', [
         'p1' => 'Ihr Finanzierungsantrag <strong>:number</strong> wurde erfolgreich bearbeitet.',
         'p2' => 'Der Betrag von <strong>:amount</strong> wurde genehmigt, und alles ist nun für die Überweisung der Mittel vorbereitet.',
         'p3' => 'Bitte wenden Sie sich für den nächsten Schritt an den zuständigen Sachbearbeiter oder an die Finanzierungsleitung, um die Mittel zu erhalten.',
+        'regards' => 'Mit freundlichen Grüßen,',
+    ],
+    'refused' => [
+        'subject' => 'Aktualisierung zu Ihrem Antrag — :number',
+        'meta_title' => 'Antrag nicht genehmigt',
+        'greeting' => 'Guten Tag :name,',
+        'p1' => 'Nach Prüfung Ihres Vorgangs <strong>:number</strong> müssen wir Ihnen leider mitteilen, dass wir Ihrem Antrag derzeit nicht stattgeben können.',
+        'reason_label' => 'Angegebener Grund:',
+        'p2' => 'Ihr Vorgang bleibt in unserem Verwaltungssystem archiviert. Er kann später erneut geprüft werden, wenn unser Team eine Reaktivierung beschließt.',
+        'p3' => 'Vielen Dank für Ihr Vertrauen. Wenn Sie weitere Informationen benötigen, stehen wir Ihnen gerne zur Verfügung.',
         'regards' => 'Mit freundlichen Grüßen,',
     ],
 ]);

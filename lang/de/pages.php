@@ -432,7 +432,7 @@ return array_replace_recursive(require __DIR__.'/../en/pages.php', [
         'settings_intro' => 'Aktualisieren Sie die wichtigsten Informationen der Website.',
         'settings_identity' => 'Website-Identität',
         'settings_site_name' => 'Name der Website',
-        'settings_tagline' => 'Tagline',
+        'settings_tagline' => 'Leitsatz',
         'settings_member_area_label' => 'Bezeichnung Mitgliederbereich',
         'settings_dashboard_label' => 'Bezeichnung Dashboard',
         'settings_public_email' => 'Öffentliche E-Mail',

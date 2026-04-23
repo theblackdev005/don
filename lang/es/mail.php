@@ -6,7 +6,7 @@ return array_replace_recursive(require __DIR__.'/../en/mail.php', [
         'brand_fallback' => 'Notificación oficial',
         'notification_label' => 'Mensaje automático',
         'contact_email_label' => 'Correo: ',
-        'contact_whatsapp_label' => 'WhatsApp: ',
+        'contact_whatsapp_label' => 'Ayuda por WhatsApp: ',
         'copyright' => 'Todos los derechos reservados.',
     ],
     'common' => [
@@ -99,6 +99,16 @@ return array_replace_recursive(require __DIR__.'/../en/mail.php', [
         'p1' => 'Su solicitud de financiación <strong>:number</strong> ha sido tramitada con éxito.',
         'p2' => 'El importe de <strong>:amount</strong> ha sido aprobado y todo está listo para la transferencia de los fondos.',
         'p3' => 'Para continuar, póngase en contacto con el gestor encargado de su expediente o con la dirección de financiación para recibir los fondos.',
+        'regards' => 'Atentamente,',
+    ],
+    'refused' => [
+        'subject' => 'Actualización de su solicitud — :number',
+        'meta_title' => 'Solicitud no aprobada',
+        'greeting' => 'Hola :name,',
+        'p1' => 'Tras revisar su expediente <strong>:number</strong>, lamentamos informarle de que no podemos darle una respuesta favorable a su solicitud en este momento.',
+        'reason_label' => 'Motivo indicado:',
+        'p2' => 'Su expediente permanece archivado en nuestro espacio de gestión. Podrá volver a revisarse más adelante si nuestro equipo decide reactivarlo.',
+        'p3' => 'Gracias por su confianza. Seguimos a su disposición si necesita información adicional.',
         'regards' => 'Atentamente,',
     ],
 ]);

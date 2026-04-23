@@ -432,7 +432,7 @@ return array_replace_recursive(require __DIR__.'/../en/pages.php', [
         'settings_intro' => 'Atualize as informações principais do site.',
         'settings_identity' => 'Identidade do site',
         'settings_site_name' => 'Nome do site',
-        'settings_tagline' => 'Tagline',
+        'settings_tagline' => 'Assinatura',
         'settings_member_area_label' => 'Etiqueta da área de membro',
         'settings_dashboard_label' => 'Etiqueta do painel',
         'settings_public_email' => 'E-mail público',

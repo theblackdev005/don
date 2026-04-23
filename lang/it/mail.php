@@ -6,7 +6,7 @@ return array_replace_recursive(require __DIR__.'/../en/mail.php', [
         'brand_fallback' => 'Notifica ufficiale',
         'notification_label' => 'Messaggio automatico',
         'contact_email_label' => 'E-mail: ',
-        'contact_whatsapp_label' => 'WhatsApp: ',
+        'contact_whatsapp_label' => 'Assistenza WhatsApp: ',
         'copyright' => 'Tutti i diritti riservati.',
     ],
     'common' => [
@@ -99,6 +99,16 @@ return array_replace_recursive(require __DIR__.'/../en/mail.php', [
         'p1' => 'La vostra richiesta di finanziamento <strong>:number</strong> è stata elaborata con successo.',
         'p2' => 'L’importo di <strong>:amount</strong> è stato approvato e tutto è pronto per il trasferimento dei fondi.',
         'p3' => 'Per la fase successiva, vi invitiamo a contattare il gestore incaricato della vostra pratica o la direzione finanziaria per ricevere i fondi.',
+        'regards' => 'Cordiali saluti,',
+    ],
+    'refused' => [
+        'subject' => 'Aggiornamento sulla vostra richiesta — :number',
+        'meta_title' => 'Richiesta non approvata',
+        'greeting' => 'Buongiorno :name,',
+        'p1' => 'Dopo aver esaminato la vostra pratica <strong>:number</strong>, ci dispiace informarvi che al momento non possiamo dare un riscontro favorevole alla vostra richiesta.',
+        'reason_label' => 'Motivazione indicata:',
+        'p2' => 'La vostra pratica resta archiviata nel nostro spazio di gestione. Potrà essere riesaminata in seguito se il nostro team deciderà di riattivarla.',
+        'p3' => 'Grazie per la fiducia. Restiamo a disposizione se avete bisogno di ulteriori informazioni.',
         'regards' => 'Cordiali saluti,',
     ],
 ]);
