@@ -92,12 +92,23 @@ class DonationActPdfService
 
     private function imageDataUriFromPublicPath(string $relativePath): ?string
     {
+        $bestCandidate = null;
+        $bestCandidateTimestamp = -1;
+
         foreach ($this->publicAssetCandidates($relativePath) as $absolutePath) {
             if (! is_file($absolutePath) || ! is_readable($absolutePath)) {
                 continue;
             }
 
-            $ext = strtolower(pathinfo($absolutePath, PATHINFO_EXTENSION));
+            $timestamp = (int) (@filemtime($absolutePath) ?: 0);
+            if ($bestCandidate === null || $timestamp >= $bestCandidateTimestamp) {
+                $bestCandidate = $absolutePath;
+                $bestCandidateTimestamp = $timestamp;
+            }
+        }
+
+        if ($bestCandidate !== null) {
+            $ext = strtolower(pathinfo($bestCandidate, PATHINFO_EXTENSION));
             $mime = match ($ext) {
                 'jpg', 'jpeg' => 'image/jpeg',
                 'gif' => 'image/gif',
@@ -105,7 +116,7 @@ class DonationActPdfService
                 default => 'image/png',
             };
 
-            return 'data:'.$mime.';base64,'.base64_encode((string) file_get_contents($absolutePath));
+            return 'data:'.$mime.';base64,'.base64_encode((string) file_get_contents($bestCandidate));
         }
 
         return null;
