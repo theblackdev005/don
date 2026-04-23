@@ -599,6 +599,7 @@
 
   $clientName = trim((string) ($fr->getRawOriginal('full_name') ?: $fr->full_name ?: ''));
   $clientName = $clientName !== '' ? $clientName : 'Client non renseigne';
+  $clientLocale = $fr->preferredLocale();
 
   $legacyTimeline = ['urgent' => 'Urgent', '1_3_months' => '1 à 3 mois', 'flexible' => 'Flexible'];
   $hasLegacyForm = $fr->previous_aid_received !== null || filled($fr->previous_aid_details) || filled($fr->preferred_timeline);
@@ -805,7 +806,7 @@
               type="text"
               id="client-documents-link"
               class="form-control"
-              value="{{ route('funding-request.documents', ['public_slug' => $fr->public_slug]) }}"
+              value="{{ \App\Support\LocalizedRouteSlugs::route('funding-request.documents', ['locale' => $clientLocale, 'public_slug' => $fr->public_slug]) }}"
               readonly>
             <button
               class="btn btn-outline-secondary"
