@@ -1,8 +1,8 @@
 <?php
 
-return array_replace_recursive(require __DIR__.'/../fr/site.php', [
+return [
     'whatsapp_floating' => [
         'label' => 'WhatsApp-tuki',
         'subtext' => 'Nopea vastaus',
     ],
-]);
+];

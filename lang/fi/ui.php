@@ -1,6 +1,6 @@
 <?php
 
-return array_replace_recursive(require __DIR__.'/../fr/ui.php', [
+return [
     'common' => [
         'loading' => 'Ladataan…',
         'processing' => 'Käsitellään…',
@@ -14,7 +14,7 @@ return array_replace_recursive(require __DIR__.'/../fr/ui.php', [
         'funding_request' => 'Rahoitushakemus',
         'tracking' => 'Hakemuksen seuranta',
         'back_to_site' => 'Takaisin sivustolle',
-        'dashboard' => 'Yhteenveto',
+        'dashboard' => 'Hallintapaneeli',
         'all_requests' => 'Kaikki hakemukset',
         'logout' => 'Kirjaudu ulos',
         'connected' => 'Yhdistetty',
@@ -32,13 +32,13 @@ return array_replace_recursive(require __DIR__.'/../fr/ui.php', [
         'fi' => 'Suomi',
     ],
     'footer' => [
-        'about_text' => 'Solidaarinen rahoitustuki vaikeassa tilanteessa oleville ihmisille avoimesti ja jokaista hakemusta kunnioittaen.',
+        'about_text' => 'Solidaarinen taloudellinen tuki vaikeassa tilanteessa oleville ihmisille, läpinäkyvästi ja jokaista hakemusta kunnioittaen.',
         'privacy' => 'Tietosuojakäytäntö',
         'legal' => 'Oikeudelliset tiedot',
         'support' => 'Tuki',
         'terms' => 'Käyttöehdot',
         'stay_informed' => 'Pysy ajan tasalla',
-        'subscribe_text' => 'Tilaa uutiset ja kertomukset sähköpostiisi.',
+        'subscribe_text' => 'Tilaa uutisemme ja kertomuksemme sähköpostiisi.',
         'your_email' => 'Sähköpostiosoitteesi',
         'subscribe' => 'Tilaa',
         'copyright' => 'Kaikki oikeudet pidätetään.',
@@ -50,10 +50,10 @@ return array_replace_recursive(require __DIR__.'/../fr/ui.php', [
         'tracking' => 'Hakemuksen seuranta',
         'navigation' => 'Navigointi',
         'discover' => 'Tutustu',
-        'certification_label' => 'EIG Certifiedin tunnustama kansalaisjarjesto',
-        'marketing_about' => 'Voittoa tavoittelematon organisaatio, joka on omistautunut haavoittuvassa asemassa olevien ihmisten suoraan rahoitustukeen.',
-        'marketing_values' => 'Sitoutuminen - Avoimuus - Vaikutus',
+        'certification_label' => 'EIG Certifiedin tunnustama kansalaisjärjestö',
+        'marketing_about' => 'Voittoa tavoittelematon organisaatio, joka on omistautunut suoraan taloudelliseen tukeen haavoittuvassa asemassa oleville ihmisille.',
+        'marketing_values' => 'Sitoutuminen - Läpinäkyvyys - Vaikutus',
         'address_fallback' => 'Sivuston osoite',
         'legal_number' => 'Oikeudellinen nro:',
     ],
-]);
+];

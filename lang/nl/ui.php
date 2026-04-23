@@ -1,6 +1,6 @@
 <?php
 
-return array_replace_recursive(require __DIR__.'/../fr/ui.php', [
+return [
     'common' => [
         'loading' => 'Laden…',
         'processing' => 'Bezig…',
@@ -10,11 +10,11 @@ return array_replace_recursive(require __DIR__.'/../fr/ui.php', [
         'home' => 'Startpagina',
         'about' => 'Over ons',
         'services' => 'Diensten',
-        'contact' => 'Contact',
+        'contact' => 'Contact opnemen',
         'funding_request' => 'Financieringsaanvraag',
         'tracking' => 'Dossieropvolging',
         'back_to_site' => 'Terug naar de site',
-        'dashboard' => 'Overzicht',
+        'dashboard' => 'Beheerpaneel',
         'all_requests' => 'Alle aanvragen',
         'logout' => 'Afmelden',
         'connected' => 'Verbonden',
@@ -32,10 +32,10 @@ return array_replace_recursive(require __DIR__.'/../fr/ui.php', [
         'fi' => 'Fins',
     ],
     'footer' => [
-        'about_text' => 'Solidaire financiele begeleiding voor mensen in een moeilijke situatie, met transparantie en respect voor elk dossier.',
+        'about_text' => 'Solidaire financiële begeleiding voor mensen in een moeilijke situatie, met transparantie en respect voor elk dossier.',
         'privacy' => 'Privacybeleid',
         'legal' => 'Juridische vermeldingen',
-        'support' => 'Hulp',
+        'support' => 'Ondersteuning',
         'terms' => 'Gebruiksvoorwaarden',
         'stay_informed' => 'Blijf op de hoogte',
         'subscribe_text' => 'Schrijf u in om ons nieuws en getuigenissen te ontvangen.',
@@ -45,15 +45,15 @@ return array_replace_recursive(require __DIR__.'/../fr/ui.php', [
         'useful_links' => 'Nuttige links',
         'programs' => 'Programma’s',
         'practical_info' => 'Praktische info',
-        'contact_us' => 'Contact opnemen',
+        'contact_us' => 'Neem contact met ons op',
         'funding_request' => 'Financieringsaanvraag',
         'tracking' => 'Dossieropvolging',
         'navigation' => 'Navigatie',
         'discover' => 'Ontdekken',
         'certification_label' => 'NGO erkend door EIG Certified',
-        'marketing_about' => 'Non-profitorganisatie die zich inzet voor rechtstreekse financiering van mensen in een kwetsbare situatie.',
+        'marketing_about' => 'Non-profitorganisatie die zich inzet voor directe financiële steun aan mensen in een kwetsbare situatie.',
         'marketing_values' => 'Betrokkenheid - Transparantie - Impact',
         'address_fallback' => 'Adres van de site',
         'legal_number' => 'Juridisch nr.:',
     ],
-]);
+];
