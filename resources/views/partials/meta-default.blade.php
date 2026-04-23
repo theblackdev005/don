@@ -1,5 +1,6 @@
 @php
-  $metaTitle = config('site.name').' | '.trans('funding.meta_title', [], app()->getLocale());
+  $pageTitle = trim((string) $__env->yieldContent('title'));
+  $metaTitle = $pageTitle !== '' ? $pageTitle : config('site.name').' | '.trans('funding.meta_title', [], app()->getLocale());
   $metaDescription = config('site.name').' - '.\App\Support\SiteMeta::description(app()->getLocale());
   $metaKeywords = \App\Support\SiteMeta::keywords(app()->getLocale());
   $metaImage = \App\Support\SiteAppearance::logoUrl();

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="fr" data-bs-theme="light">
+<html lang="{{ app()->getLocale() }}" data-bs-theme="light">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport"
     content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
 
-  <title>{{ config('site.name') }} | {{ __('funding.meta_title') }}</title>
+  <title>@yield('title', config('site.name').' | '.__('funding.meta_title'))</title>
   @stack('meta')
 
   <link rel="manifest" href="/manifest.json">
