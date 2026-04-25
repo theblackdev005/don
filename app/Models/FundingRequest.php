@@ -178,6 +178,14 @@ class FundingRequest extends Model
         return is_string($stored) ? trim($stored) : '';
     }
 
+    public function getPhoneDisplayAttribute(): string
+    {
+        return trim(implode(' ', array_filter([
+            trim((string) ($this->phone_prefix ?? '')),
+            trim((string) ($this->phone ?? '')),
+        ])));
+    }
+
     /** Langue du formulaire au moment du dépôt (e-mails / PDF bénéficiaire). */
     public function preferredLocale(): string
     {

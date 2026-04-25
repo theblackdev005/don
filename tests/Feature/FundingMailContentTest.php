@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Mail\FundingDocumentsReceivedAdminMail;
 use App\Mail\FundingPreliminaryAcceptedMail;
+use App\Mail\FundingRequestReceivedAdminMail;
 use App\Mail\FundingRequestReceivedApplicantMail;
 use App\Mail\FundingRequestRefusedMail;
 use App\Models\FundingRequest;
@@ -63,6 +64,21 @@ class FundingMailContentTest extends TestCase
             ]),
             $html
         );
+    }
+
+    public function test_admin_mails_display_phone_prefix_with_number(): void
+    {
+        $fundingRequest = FundingRequest::factory()->create([
+            'locale' => 'fr',
+            'phone_prefix' => '+41',
+            'phone' => '791234567',
+        ]);
+
+        $receivedHtml = (new FundingRequestReceivedAdminMail($fundingRequest))->render();
+        $documentsHtml = (new FundingDocumentsReceivedAdminMail($fundingRequest))->render();
+
+        $this->assertStringContainsString('+41 791234567', $receivedHtml);
+        $this->assertStringContainsString('+41 791234567', $documentsHtml);
     }
 
     public function test_refused_mail_displays_reason_to_client(): void

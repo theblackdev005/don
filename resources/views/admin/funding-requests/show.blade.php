@@ -939,7 +939,7 @@
         </div>
         <div class="admin-info-panel">
           <div class="admin-info-item-label">Téléphone</div>
-          <div class="admin-info-item-value">{{ $fr->phone ?? '—' }}</div>
+          <div class="admin-info-item-value">{{ $fr->phone_display !== '' ? $fr->phone_display : '—' }}</div>
         </div>
         <div class="admin-info-panel">
           <div class="admin-info-item-label">Pays de résidence</div>

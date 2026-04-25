@@ -21,6 +21,7 @@ class PublicFundingPagesTest extends TestCase
         $response->assertSee('1. Informations personnelles');
         $response->assertSee('2. Votre situation');
         $response->assertSee('3. Votre demande');
+        $response->assertSee('+41');
     }
 
     public function test_success_page_displays_next_step_message(): void

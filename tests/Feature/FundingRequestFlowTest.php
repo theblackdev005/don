@@ -342,6 +342,27 @@ class FundingRequestFlowTest extends TestCase
         $showResponse->assertSee('Frais de dossier');
     }
 
+    public function test_admin_dossier_displays_phone_prefix_with_number(): void
+    {
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+
+        $fundingRequest = FundingRequest::factory()->create([
+            'phone_prefix' => '+41',
+            'phone' => '791234567',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->get(route('admin.funding-requests.show', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]));
+
+        $response->assertOk();
+        $response->assertSee('+41 791234567');
+    }
+
     public function test_admin_can_browse_and_update_database_rows(): void
     {
         $admin = User::factory()->create([

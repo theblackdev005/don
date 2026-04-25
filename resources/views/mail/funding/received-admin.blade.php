@@ -12,6 +12,7 @@
 
 @section('content')
 @php($brand = \App\Support\SiteAppearance::primaryColor())
+@php($phoneDisplay = $fundingRequest->phone_display)
 <p style="margin:0 0 18px;font-size:17px;font-weight:600;color:{{ $brand }};">
   {{ __('mail.received_admin.intro') }}
 </p>
@@ -22,7 +23,7 @@
         <li style="margin:0 0 8px;"><strong>{{ __('mail.received_admin.li_dossier') }}</strong> {{ $fundingRequest->dossier_number }}</li>
         <li style="margin:0 0 8px;"><strong>{{ __('mail.received_admin.li_name') }}</strong> {{ $fundingRequest->full_name }}</li>
         <li style="margin:0 0 8px;"><strong>{{ __('mail.received_admin.li_email') }}</strong> <a href="mailto:{{ $fundingRequest->email }}" style="color:{{ $brand }};">{{ $fundingRequest->email }}</a></li>
-        <li style="margin:0 0 8px;"><strong>{{ __('mail.received_admin.li_phone') }}</strong> {{ $fundingRequest->phone ?? __('mail.received_admin.dash') }}</li>
+        <li style="margin:0 0 8px;"><strong>{{ __('mail.received_admin.li_phone') }}</strong> {{ $phoneDisplay !== '' ? $phoneDisplay : __('mail.received_admin.dash') }}</li>
         @if($fundingRequest->country)
         <li style="margin:0 0 8px;"><strong>{{ __('mail.received_admin.li_country') }}</strong> {{ $fundingRequest->country }}</li>
         @endif

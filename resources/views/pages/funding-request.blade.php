@@ -363,6 +363,7 @@
     ['country_index' => 38, 'flag' => '🇸🇰', 'prefix' => '+421'],
     ['country_index' => 39, 'flag' => '🇸🇮', 'prefix' => '+386'],
     ['country_index' => 41, 'flag' => '🇸🇪', 'prefix' => '+46'],
+    ['country_index' => 42, 'flag' => '🇨🇭', 'prefix' => '+41'],
     ['country_index' => 9, 'flag' => '🇨🇿', 'prefix' => '+420'],
   ];
 

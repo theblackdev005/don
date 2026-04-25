@@ -198,15 +198,10 @@ class FundingRequestAdminController extends Controller
             fputcsv($handle, ['Nom complet', 'E-mail', 'Téléphone']);
 
             foreach ($contacts as $contact) {
-                $phoneDisplay = trim(implode(' ', array_filter([
-                    trim((string) $contact->phone_prefix),
-                    trim((string) $contact->phone),
-                ])));
-
                 fputcsv($handle, [
                     (string) ($contact->full_name ?: ''),
                     (string) ($contact->email ?: ''),
-                    $phoneDisplay,
+                    $contact->phone_display,
                 ]);
             }
 

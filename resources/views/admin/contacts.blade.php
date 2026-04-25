@@ -166,10 +166,7 @@
           <tbody>
             @foreach ($contacts as $contact)
               @php
-                $phoneDisplay = trim(implode(' ', array_filter([
-                  trim((string) $contact->phone_prefix),
-                  trim((string) $contact->phone),
-                ])));
+                $phoneDisplay = $contact->phone_display;
               @endphp
               <tr>
                 <td>
