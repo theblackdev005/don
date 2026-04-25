@@ -234,6 +234,10 @@
                 <i class="ai-at fs-lg opacity-70 me-2"></i>
                 SMTP
               </a>
+              <a class="dropdown-item" href="{{ route('admin.database.index') }}">
+                <i class="ai-database fs-lg opacity-70 me-2"></i>
+                Base de données
+              </a>
               <div class="dropdown-divider"></div>
               <form method="post" action="{{ route('admin.logout') }}" class="d-grid">
                 @csrf
@@ -294,6 +298,10 @@
                   <a class="dropdown-item" href="{{ route('admin.smtp.edit') }}">
                     <i class="ai-at fs-lg opacity-70 me-2"></i>
                     SMTP
+                  </a>
+                  <a class="dropdown-item" href="{{ route('admin.database.index') }}">
+                    <i class="ai-database fs-lg opacity-70 me-2"></i>
+                    Base de données
                   </a>
                   <div class="dropdown-divider"></div>
                   <form method="post" action="{{ route('admin.logout') }}" class="px-3 py-1">
@@ -360,6 +368,10 @@
                   <a class="admin-side-link fw-semibold {{ $navActive === 'smtp' ? 'active' : '' }}" href="{{ route('admin.smtp.edit') }}">
                     <i class="ai-at fs-5 opacity-60 me-2"></i>
                     SMTP
+                  </a>
+                  <a class="admin-side-link fw-semibold {{ $navActive === 'database' ? 'active' : '' }}" href="{{ route('admin.database.index') }}">
+                    <i class="ai-database fs-5 opacity-60 me-2"></i>
+                    Base de données
                   </a>
                 </nav>
                 <nav class="nav flex-column">

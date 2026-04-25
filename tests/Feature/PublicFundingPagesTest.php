@@ -72,7 +72,7 @@ class PublicFundingPagesTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Merci, vos documents ont été transmis Jean');
-        $response->assertSee('Notre équipe va analyser votre dossier et vous contacter.');
+        $response->assertSee('Notre équipe analysera votre dossier et vous recontactera.');
         $response->assertSee('Accéder à mon dossier');
     }
 

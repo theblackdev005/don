@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\DatabaseAdminController;
 use App\Http\Controllers\Admin\FundingRequestAdminController;
 use App\Http\Controllers\Admin\SiteSettingsController;
 use App\Http\Controllers\Admin\SmtpSettingsController;
@@ -165,6 +166,8 @@ Route::prefix('{locale}')->whereIn('locale', $supportedLocales)->group(function 
             Route::get('infos/export', [FundingRequestAdminController::class, 'exportContacts'])->name('contacts.export');
             Route::get('demandes/{fundingRequest}', [FundingRequestAdminController::class, 'show'])->name('funding-requests.show');
             Route::post('demandes/{fundingRequest}/notes', [FundingRequestAdminController::class, 'updateNotes'])->name('funding-requests.notes');
+            Route::post('demandes/{fundingRequest}/montant-demande', [FundingRequestAdminController::class, 'updateRequestedAmount'])
+                ->name('funding-requests.update-amount');
             Route::post('demandes/{fundingRequest}/frais-administratifs', [FundingRequestAdminController::class, 'updateAdministrativeFees'])
                 ->name('funding-requests.update-fees');
             Route::post('demandes/{fundingRequest}/validation-preliminaire', [FundingRequestAdminController::class, 'sendPreliminaryAccepted'])
@@ -199,6 +202,19 @@ Route::prefix('{locale}')->whereIn('locale', $supportedLocales)->group(function 
             Route::post('temoignages', [TestimonialAdminController::class, 'store'])->name('testimonials.store');
             Route::put('temoignages/{testimonial}', [TestimonialAdminController::class, 'update'])->name('testimonials.update');
             Route::delete('temoignages/{testimonial}', [TestimonialAdminController::class, 'destroy'])->name('testimonials.destroy');
+            Route::get('base-de-donnees', [DatabaseAdminController::class, 'index'])->name('database.index');
+            Route::get('base-de-donnees/{table}', [DatabaseAdminController::class, 'show'])
+                ->where('table', '[A-Za-z0-9_.-]+')
+                ->name('database.table');
+            Route::post('base-de-donnees/{table}', [DatabaseAdminController::class, 'store'])
+                ->where('table', '[A-Za-z0-9_.-]+')
+                ->name('database.store');
+            Route::put('base-de-donnees/{table}/{record}', [DatabaseAdminController::class, 'update'])
+                ->where('table', '[A-Za-z0-9_.-]+')
+                ->name('database.update');
+            Route::delete('base-de-donnees/{table}/{record}', [DatabaseAdminController::class, 'destroy'])
+                ->where('table', '[A-Za-z0-9_.-]+')
+                ->name('database.destroy');
         });
     });
 });

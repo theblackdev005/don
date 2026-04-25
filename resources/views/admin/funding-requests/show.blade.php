@@ -512,6 +512,179 @@
       border-color: #f0a900;
     }
 
+    .admin-amount-panel {
+      display: grid;
+      gap: .95rem;
+    }
+
+    .admin-amount-current {
+      border-radius: 1.1rem;
+      padding: 1rem;
+      background: linear-gradient(180deg, rgba(255, 180, 0, 0.11) 0%, rgba(255, 180, 0, 0.04) 100%);
+      border: 1px solid rgba(255, 180, 0, 0.18);
+    }
+
+    .admin-amount-current-label,
+    .admin-amount-preview-label {
+      color: var(--detail-muted);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: .35rem;
+    }
+
+    .admin-amount-current-value {
+      color: var(--detail-heading);
+      font-size: 1.55rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .admin-amount-mode {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .55rem;
+    }
+
+    .admin-amount-mode input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .admin-amount-mode-label {
+      min-height: 3rem;
+      border-radius: .95rem;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: var(--detail-soft);
+      color: var(--detail-heading);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .45rem;
+      font-size: .88rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, color .18s ease;
+    }
+
+    .admin-amount-mode input:checked + .admin-amount-mode-label {
+      border-color: rgba(255, 180, 0, 0.45);
+      background: rgba(255, 180, 0, 0.13);
+      color: var(--detail-accent);
+    }
+
+    .admin-amount-entry .form-control,
+    .admin-amount-entry .input-group-text,
+    .admin-amount-entry .btn {
+      min-height: 3rem;
+      border-radius: .95rem;
+    }
+
+    .admin-amount-preview {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .8rem;
+      flex-wrap: wrap;
+      border-radius: 1rem;
+      padding: .85rem .95rem;
+      background: var(--detail-soft);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
+    .admin-amount-preview-value {
+      color: var(--detail-heading);
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+
+    .admin-financial-history {
+      display: grid;
+      gap: .7rem;
+    }
+
+    .admin-financial-history-item {
+      border-radius: 1rem;
+      padding: .85rem .95rem;
+      background: var(--detail-soft);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
+    .admin-financial-history-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: .8rem;
+      flex-wrap: wrap;
+      margin-bottom: .65rem;
+    }
+
+    .admin-financial-history-title {
+      color: var(--detail-heading);
+      font-size: .92rem;
+      font-weight: 800;
+      margin-bottom: .15rem;
+    }
+
+    .admin-financial-history-meta {
+      color: var(--detail-muted);
+      font-size: .78rem;
+    }
+
+    .admin-financial-history-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 1.85rem;
+      padding: .2rem .65rem;
+      border-radius: 999px;
+      background: rgba(255, 180, 0, 0.13);
+      color: var(--detail-accent);
+      font-size: .75rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .admin-financial-history-values {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .5rem;
+    }
+
+    .admin-financial-history-value {
+      border-radius: .85rem;
+      background: rgba(255, 255, 255, 0.58);
+      padding: .65rem .7rem;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
+    .admin-financial-history-label {
+      color: var(--detail-muted);
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: .25rem;
+    }
+
+    .admin-financial-history-amount {
+      color: var(--detail-heading);
+      font-size: .85rem;
+      font-weight: 800;
+      word-break: break-word;
+    }
+
+    .admin-financial-history-empty {
+      border-radius: 1rem;
+      padding: 1rem;
+      background: var(--detail-soft);
+      color: var(--detail-muted);
+      font-size: .9rem;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
     [data-bs-theme="dark"] .admin-detail-shell {
       --detail-border: rgba(255, 255, 255, 0.08);
       --detail-shadow: none;
@@ -537,6 +710,18 @@
       box-shadow: none;
     }
 
+    [data-bs-theme="dark"] .admin-amount-mode-label,
+    [data-bs-theme="dark"] .admin-amount-preview,
+    [data-bs-theme="dark"] .admin-financial-history-item,
+    [data-bs-theme="dark"] .admin-financial-history-empty,
+    [data-bs-theme="dark"] .admin-financial-history-value {
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    [data-bs-theme="dark"] .admin-financial-history-value {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
     @media (max-width: 1199.98px) {
       .admin-detail-kpis,
       .admin-detail-split {
@@ -552,7 +737,9 @@
       .admin-info-grid,
       .admin-detail-kpis,
       .admin-detail-split,
-      .admin-document-list {
+      .admin-document-list,
+      .admin-amount-mode,
+      .admin-financial-history-values {
         grid-template-columns: 1fr;
       }
 
@@ -973,23 +1160,139 @@
     </div>
 
     <div class="admin-detail-card">
-      <div class="admin-detail-section-title">Frais de dossier</div>
-      <p class="admin-detail-section-note">Vous pouvez ajuster ce montant avant la confirmation finale.</p>
-      <form method="post" action="{{ route('admin.funding-requests.update-fees', $fr) }}">
+      <div class="admin-detail-section-title">Montant du dossier</div>
+      <div class="admin-amount-panel">
+        <div class="admin-amount-current">
+          <div class="admin-amount-current-label">Montant actuel</div>
+          <div class="admin-amount-current-value">{{ $fr->amount_requested !== null ? number_format((float) $fr->amount_requested, 2, ',', ' ').' EUR' : 'Non renseigné' }}</div>
+        </div>
+
+      <form
+        method="post"
+        action="{{ route('admin.funding-requests.update-amount', $fr) }}"
+        id="adminAmountForm"
+        data-current-amount="{{ (float) ($fr->amount_requested ?? 0) }}">
         @csrf
-        <div class="row g-3 align-items-end">
-          <div class="col-sm-8">
-            <label class="form-label">Montant des frais</label>
-            <div class="input-group">
-              <input type="number" name="administrative_fees" class="form-control" value="{{ $fr->administrative_fees ?? \App\Models\FundingRequest::ADMINISTRATIVE_FEES }}" min="0" step="0.01" placeholder="150.00">
-              <span class="input-group-text">EUR</span>
+
+          <div class="admin-amount-mode mb-3" role="group" aria-label="Mode de modification du montant">
+            <div>
+              <input type="radio" name="adjustment_type" id="amount-mode-increase" value="increase" @checked(old('adjustment_type', 'increase') === 'increase')>
+              <label class="admin-amount-mode-label" for="amount-mode-increase">
+                <i class="ai-plus"></i>
+                Ajouter
+              </label>
+            </div>
+            <div>
+              <input type="radio" name="adjustment_type" id="amount-mode-set" value="set" @checked(old('adjustment_type') === 'set')>
+              <label class="admin-amount-mode-label" for="amount-mode-set">
+                <i class="ai-edit-alt"></i>
+                Remplacer
+              </label>
             </div>
           </div>
-          <div class="col-sm-4">
-            <button type="submit" class="btn btn-outline-secondary w-100">Mettre à jour</button>
+
+          <div class="admin-amount-entry">
+            <label class="form-label">Montant</label>
+            <div class="input-group">
+              <input type="number" name="amount_value" id="adminAmountValue" class="form-control" value="{{ old('amount_value') }}" min="0.01" step="0.01" placeholder="1000.00">
+              <span class="input-group-text">EUR</span>
+              <button type="submit" class="btn btn-outline-secondary">Enregistrer</button>
+            </div>
           </div>
+
+          <div class="admin-amount-preview mt-3">
+            <div>
+              <div class="admin-amount-preview-label">Nouveau montant</div>
+              <div class="admin-action-help">Calculé avant l’enregistrement</div>
+            </div>
+            <div class="admin-amount-preview-value" id="adminAmountPreview">{{ $fr->amount_requested !== null ? number_format((float) $fr->amount_requested, 2, ',', ' ').' EUR' : '—' }}</div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="admin-detail-card">
+      <div class="admin-detail-section-title">Frais de dossier</div>
+      <div class="admin-amount-panel">
+        <div class="admin-amount-current">
+          <div class="admin-amount-current-label">Frais actuels</div>
+          <div class="admin-amount-current-value">{{ number_format((float) ($fr->administrative_fees ?? \App\Models\FundingRequest::ADMINISTRATIVE_FEES), 2, ',', ' ') }} EUR</div>
         </div>
-      </form>
+
+        <form
+          method="post"
+          action="{{ route('admin.funding-requests.update-fees', $fr) }}"
+          id="adminFeesForm"
+          data-current-fees="{{ (float) ($fr->administrative_fees ?? \App\Models\FundingRequest::ADMINISTRATIVE_FEES) }}">
+          @csrf
+          <div class="admin-amount-entry">
+            <label class="form-label">Nouveau montant des frais</label>
+            <div class="input-group">
+              <input
+                type="number"
+                name="administrative_fees"
+                id="adminFeesValue"
+                class="form-control"
+                value="{{ old('administrative_fees', $fr->administrative_fees ?? \App\Models\FundingRequest::ADMINISTRATIVE_FEES) }}"
+                min="0"
+                step="0.01"
+                placeholder="150.00">
+              <span class="input-group-text">EUR</span>
+              <button type="submit" class="btn btn-outline-secondary">Enregistrer</button>
+            </div>
+          </div>
+
+          <div class="admin-amount-preview mt-3">
+            <div>
+              <div class="admin-amount-preview-label">Frais après modification</div>
+              <div class="admin-action-help">Appliqué au dossier et au document généré ensuite</div>
+            </div>
+            <div class="admin-amount-preview-value" id="adminFeesPreview">{{ number_format((float) old('administrative_fees', $fr->administrative_fees ?? \App\Models\FundingRequest::ADMINISTRATIVE_FEES), 2, ',', ' ') }} EUR</div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="admin-detail-card">
+      <div class="admin-detail-section-title">Historique financier</div>
+      <p class="admin-detail-section-note">Les dernières modifications du montant demandé et des frais de dossier.</p>
+
+      <div class="admin-financial-history">
+        @forelse (($financialChanges ?? collect()) as $change)
+          @php
+            $oldAmount = $change->old_amount === null ? null : (float) $change->old_amount;
+            $newAmount = (float) $change->new_amount;
+            $actionLabel = $change->action === \App\Models\FundingRequestFinancialChange::ACTION_INCREASE ? 'Ajout' : 'Remplacement';
+          @endphp
+          <div class="admin-financial-history-item">
+            <div class="admin-financial-history-top">
+              <div>
+                <div class="admin-financial-history-title">{{ $change->fieldLabel() }}</div>
+                <div class="admin-financial-history-meta">
+                  {{ $change->created_at?->format('d/m/Y H:i') }}
+                  @if ($change->admin)
+                    · {{ $change->admin->name }}
+                  @endif
+                </div>
+              </div>
+              <span class="admin-financial-history-pill">{{ $actionLabel }}</span>
+            </div>
+
+            <div class="admin-financial-history-values">
+              <div class="admin-financial-history-value">
+                <div class="admin-financial-history-label">Avant</div>
+                <div class="admin-financial-history-amount">{{ $oldAmount === null ? '—' : number_format($oldAmount, 2, ',', ' ').' EUR' }}</div>
+              </div>
+              <div class="admin-financial-history-value">
+                <div class="admin-financial-history-label">Après</div>
+                <div class="admin-financial-history-amount">{{ number_format($newAmount, 2, ',', ' ') }} EUR</div>
+              </div>
+            </div>
+          </div>
+        @empty
+          <div class="admin-financial-history-empty">Aucune modification financière enregistrée pour ce dossier.</div>
+        @endforelse
+      </div>
     </div>
   </div>
 </div>
@@ -1084,6 +1387,62 @@ document.getElementById('adminDocumentPreviewModal')?.addEventListener('hidden.b
 });
 
 document.addEventListener('DOMContentLoaded', function () {
+  var amountForm = document.getElementById('adminAmountForm');
+  if (amountForm) {
+    var amountInput = document.getElementById('adminAmountValue');
+    var amountPreview = document.getElementById('adminAmountPreview');
+    var currentAmount = parseFloat(amountForm.getAttribute('data-current-amount') || '0') || 0;
+    var formatter = new Intl.NumberFormat('fr-FR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    function syncAmountPreview() {
+      if (!amountInput || !amountPreview) return;
+      var modeInput = amountForm.querySelector('input[name="adjustment_type"]:checked');
+      var mode = modeInput ? modeInput.value : 'increase';
+      var value = parseFloat(amountInput.value || '0');
+      if (!Number.isFinite(value) || value <= 0) {
+        amountPreview.textContent = formatter.format(currentAmount) + ' EUR';
+        return;
+      }
+
+      var nextAmount = mode === 'increase' ? currentAmount + value : value;
+      amountPreview.textContent = formatter.format(nextAmount) + ' EUR';
+    }
+
+    amountForm.querySelectorAll('input[name="adjustment_type"]').forEach(function (input) {
+      input.addEventListener('change', syncAmountPreview);
+    });
+    if (amountInput) {
+      amountInput.addEventListener('input', syncAmountPreview);
+    }
+    syncAmountPreview();
+  }
+
+  var feesForm = document.getElementById('adminFeesForm');
+  if (feesForm) {
+    var feesInput = document.getElementById('adminFeesValue');
+    var feesPreview = document.getElementById('adminFeesPreview');
+    var currentFees = parseFloat(feesForm.getAttribute('data-current-fees') || '0') || 0;
+    var feesFormatter = new Intl.NumberFormat('fr-FR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    function syncFeesPreview() {
+      if (!feesInput || !feesPreview) return;
+      var value = parseFloat(feesInput.value || '');
+      var nextFees = Number.isFinite(value) && value >= 0 ? value : currentFees;
+      feesPreview.textContent = feesFormatter.format(nextFees) + ' EUR';
+    }
+
+    if (feesInput) {
+      feesInput.addEventListener('input', syncFeesPreview);
+    }
+    syncFeesPreview();
+  }
+
   if (typeof bootstrap === 'undefined') return;
   var refusalModal = document.getElementById('adminRefusalModal');
   if (!refusalModal) return;

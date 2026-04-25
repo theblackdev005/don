@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class FundingRequest extends Model
@@ -142,6 +143,11 @@ class FundingRequest extends Model
         'declare_accurate' => 'boolean',
         'donation_act_generated_at' => 'datetime',
     ];
+
+    public function financialChanges(): HasMany
+    {
+        return $this->hasMany(FundingRequestFinancialChange::class);
+    }
 
     public static function statusLabels(): array
     {

@@ -10,12 +10,15 @@ use App\Mail\FundingPreliminarySentAdminMail;
 use App\Mail\FundingRequestClosedMail;
 use App\Mail\FundingRequestRefusedMail;
 use App\Models\FundingRequest;
+use App\Models\FundingRequestFinancialChange;
 use App\Services\DonationActPdfService;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response as ResponseFactory;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
@@ -214,9 +217,15 @@ class FundingRequestAdminController extends Controller
         }
 
         $fundingRequest->refresh();
+        $financialChanges = $fundingRequest->financialChanges()
+            ->with('admin')
+            ->latest('id')
+            ->limit(12)
+            ->get();
 
         return view('admin.funding-requests.show', [
             'fr' => $fundingRequest,
+            'financialChanges' => $financialChanges,
             'adminActive' => 'demandes',
         ]);
     }
@@ -400,10 +409,101 @@ class FundingRequestAdminController extends Controller
             'administrative_fees' => ['required', 'numeric', 'min:0', 'max:999999.99'],
         ]);
 
-        $fundingRequest->administrative_fees = $validated['administrative_fees'];
-        $fundingRequest->save();
+        $oldAmount = $this->decimalString($fundingRequest->administrative_fees ?? FundingRequest::ADMINISTRATIVE_FEES);
+        $newAmount = $this->decimalString($validated['administrative_fees']);
+
+        if ($oldAmount === $newAmount) {
+            return back()->with('ok', 'Frais administratifs inchangés.');
+        }
+
+        DB::transaction(function () use ($fundingRequest, $oldAmount, $newAmount) {
+            $fundingRequest->administrative_fees = $newAmount;
+            $fundingRequest->save();
+
+            $this->recordFinancialChange(
+                $fundingRequest,
+                FundingRequestFinancialChange::FIELD_ADMINISTRATIVE_FEES,
+                FundingRequestFinancialChange::ACTION_SET,
+                $oldAmount,
+                $newAmount
+            );
+        });
 
         return back()->with('ok', 'Frais administratifs mis à jour avec succès.');
+    }
+
+    public function updateRequestedAmount(string $locale, Request $request, FundingRequest $fundingRequest)
+    {
+        $validated = $request->validate([
+            'adjustment_type' => ['required', Rule::in(['set', 'increase'])],
+            'amount_value' => ['required', 'numeric', 'min:0.01', 'max:999999999.99'],
+        ], [
+            'amount_value.required' => 'Indiquez le montant à appliquer.',
+            'amount_value.min' => 'Le montant doit être supérieur à zéro.',
+        ]);
+
+        $oldAmount = $fundingRequest->amount_requested === null
+            ? null
+            : $this->decimalString($fundingRequest->amount_requested);
+        $currentAmount = (float) ($oldAmount ?? 0);
+        $value = (float) $validated['amount_value'];
+        $newAmount = $validated['adjustment_type'] === 'increase'
+            ? $currentAmount + $value
+            : $value;
+
+        if ($newAmount > 999999999.99) {
+            return back()->withErrors(['amount_value' => 'Le montant final est trop élevé.']);
+        }
+
+        $newAmount = $this->decimalString($newAmount);
+
+        if ($oldAmount !== null && $oldAmount === $newAmount) {
+            return back()->with('ok', 'Montant demandé inchangé.');
+        }
+
+        DB::transaction(function () use ($fundingRequest, $validated, $oldAmount, $newAmount) {
+            $fundingRequest->amount_requested = $newAmount;
+            $fundingRequest->save();
+
+            $this->recordFinancialChange(
+                $fundingRequest,
+                FundingRequestFinancialChange::FIELD_AMOUNT_REQUESTED,
+                $validated['adjustment_type'],
+                $oldAmount,
+                $newAmount
+            );
+        });
+
+        $message = $validated['adjustment_type'] === 'increase'
+            ? 'Montant demandé augmenté avec succès.'
+            : 'Montant demandé mis à jour avec succès.';
+
+        return back()->with('ok', $message);
+    }
+
+    private function recordFinancialChange(
+        FundingRequest $fundingRequest,
+        string $field,
+        string $action,
+        ?string $oldAmount,
+        string $newAmount
+    ): void {
+        $old = $oldAmount === null ? null : (float) $oldAmount;
+        $new = (float) $newAmount;
+
+        $fundingRequest->financialChanges()->create([
+            'admin_id' => auth()->id(),
+            'field' => $field,
+            'action' => $action,
+            'old_amount' => $oldAmount,
+            'new_amount' => $newAmount,
+            'delta_amount' => $old === null ? $newAmount : $this->decimalString($new - $old),
+        ]);
+    }
+
+    private function decimalString(mixed $value): string
+    {
+        return number_format((float) $value, 2, '.', '');
     }
 
     public function downloadDonationAct(string $locale, FundingRequest $fundingRequest): StreamedResponse|\Illuminate\Http\RedirectResponse

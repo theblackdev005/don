@@ -10,6 +10,7 @@ use App\Mail\FundingRequestReceivedAdminMail;
 use App\Mail\FundingRequestReceivedApplicantMail;
 use App\Mail\FundingRequestRefusedMail;
 use App\Models\FundingRequest;
+use App\Models\FundingRequestFinancialChange;
 use App\Models\User;
 use App\Services\DonationActPdfService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -207,6 +208,150 @@ class FundingRequestFlowTest extends TestCase
         $reactivateResponse->assertSessionHasNoErrors();
         $this->assertSame(FundingRequest::STATUS_PENDING, $fundingRequest->status);
         $this->assertNull($fundingRequest->refused_reason);
+    }
+
+    public function test_admin_can_update_requested_amount(): void
+    {
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+
+        $fundingRequest = FundingRequest::factory()->create([
+            'amount_requested' => 50000,
+        ]);
+
+        $setResponse = $this->actingAs($admin)
+            ->post(route('admin.funding-requests.update-amount', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]), [
+                'adjustment_type' => 'set',
+                'amount_value' => '65000',
+            ]);
+
+        $fundingRequest->refresh();
+
+        $setResponse->assertSessionHasNoErrors();
+        $this->assertSame('65000.00', $fundingRequest->amount_requested);
+        $this->assertSame(1, FundingRequestFinancialChange::query()->count());
+
+        $setChange = FundingRequestFinancialChange::query()->first();
+        $this->assertTrue($setChange->fundingRequest->is($fundingRequest));
+        $this->assertTrue($setChange->admin->is($admin));
+        $this->assertSame(FundingRequestFinancialChange::FIELD_AMOUNT_REQUESTED, $setChange->field);
+        $this->assertSame(FundingRequestFinancialChange::ACTION_SET, $setChange->action);
+        $this->assertSame('50000.00', $setChange->old_amount);
+        $this->assertSame('65000.00', $setChange->new_amount);
+        $this->assertSame('15000.00', $setChange->delta_amount);
+
+        $increaseResponse = $this->actingAs($admin)
+            ->post(route('admin.funding-requests.update-amount', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]), [
+                'adjustment_type' => 'increase',
+                'amount_value' => '2500',
+            ]);
+
+        $fundingRequest->refresh();
+
+        $increaseResponse->assertSessionHasNoErrors();
+        $this->assertSame('67500.00', $fundingRequest->amount_requested);
+        $this->assertSame(2, FundingRequestFinancialChange::query()->count());
+
+        $increaseChange = FundingRequestFinancialChange::query()->orderByDesc('id')->first();
+        $this->assertSame(FundingRequestFinancialChange::FIELD_AMOUNT_REQUESTED, $increaseChange->field);
+        $this->assertSame(FundingRequestFinancialChange::ACTION_INCREASE, $increaseChange->action);
+        $this->assertSame('65000.00', $increaseChange->old_amount);
+        $this->assertSame('67500.00', $increaseChange->new_amount);
+        $this->assertSame('2500.00', $increaseChange->delta_amount);
+    }
+
+    public function test_admin_can_update_administrative_fees_and_record_history(): void
+    {
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+
+        $fundingRequest = FundingRequest::factory()->create([
+            'administrative_fees' => 150,
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->post(route('admin.funding-requests.update-fees', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]), [
+                'administrative_fees' => '275',
+            ]);
+
+        $fundingRequest->refresh();
+
+        $response->assertSessionHasNoErrors();
+        $this->assertSame('275.00', $fundingRequest->administrative_fees);
+
+        $change = FundingRequestFinancialChange::query()->first();
+        $this->assertNotNull($change);
+        $this->assertSame(FundingRequestFinancialChange::FIELD_ADMINISTRATIVE_FEES, $change->field);
+        $this->assertSame(FundingRequestFinancialChange::ACTION_SET, $change->action);
+        $this->assertSame('150.00', $change->old_amount);
+        $this->assertSame('275.00', $change->new_amount);
+        $this->assertSame('125.00', $change->delta_amount);
+
+        $showResponse = $this->actingAs($admin)
+            ->get(route('admin.funding-requests.show', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
+            ]));
+
+        $showResponse->assertOk();
+        $showResponse->assertSee('Historique financier');
+        $showResponse->assertSee('Frais de dossier');
+    }
+
+    public function test_admin_can_browse_and_update_database_rows(): void
+    {
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+
+        $fundingRequest = FundingRequest::factory()->create([
+            'amount_requested' => 50000,
+            'admin_notes' => null,
+        ]);
+
+        $indexResponse = $this->actingAs($admin)
+            ->get(route('admin.database.index', ['locale' => 'fr']));
+
+        $indexResponse->assertOk();
+        $indexResponse->assertSee('funding_requests');
+
+        $tableResponse = $this->actingAs($admin)
+            ->get(route('admin.database.table', [
+                'locale' => 'fr',
+                'table' => 'funding_requests',
+            ]));
+
+        $tableResponse->assertOk();
+        $tableResponse->assertSee($fundingRequest->dossier_number);
+
+        $updateResponse = $this->actingAs($admin)
+            ->put(route('admin.database.update', [
+                'locale' => 'fr',
+                'table' => 'funding_requests',
+                'record' => $fundingRequest->id,
+            ]), [
+                'values' => [
+                    'amount_requested' => '72000.00',
+                    'admin_notes' => 'Correction directe via la base.',
+                ],
+            ]);
+
+        $fundingRequest->refresh();
+
+        $updateResponse->assertSessionHasNoErrors();
+        $this->assertSame('72000.00', $fundingRequest->amount_requested);
+        $this->assertSame('Correction directe via la base.', $fundingRequest->admin_notes);
     }
 
     public function test_admin_can_send_preliminary_validation_and_move_dossier_to_documents_stage(): void

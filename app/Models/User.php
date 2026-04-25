@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -51,6 +52,11 @@ class User extends Authenticatable implements CanResetPasswordContract
     public function isAdmin(): bool
     {
         return (bool) $this->is_admin;
+    }
+
+    public function fundingRequestFinancialChanges(): HasMany
+    {
+        return $this->hasMany(FundingRequestFinancialChange::class, 'admin_id');
     }
 
     public function sendPasswordResetNotification($token): void
