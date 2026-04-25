@@ -98,16 +98,27 @@
       text-transform: uppercase;
     }
 
+    .admin-side-nav {
+      gap: .25rem;
+    }
+
     .admin-side-link {
       display: flex;
       align-items: center;
       gap: .75rem;
-      min-height: 3.15rem;
-      padding: .7rem .85rem;
-      border-radius: 1rem;
+      min-height: 2.85rem;
+      padding: .65rem .75rem;
+      border-radius: .85rem;
       color: var(--admin-heading);
       text-decoration: none;
       transition: background .18s ease, color .18s ease, transform .18s ease;
+    }
+
+    .admin-side-link i,
+    .admin-side-group-summary i {
+      width: 1.25rem;
+      text-align: center;
+      flex: 0 0 auto;
     }
 
     .admin-side-link:hover {
@@ -118,6 +129,70 @@
 
     .admin-side-link.active {
       background: rgba(255, 180, 0, 0.14);
+      color: var(--admin-accent);
+    }
+
+    .admin-side-group {
+      margin-top: .35rem;
+      border-top: 1px solid rgba(148, 163, 184, 0.14);
+      padding-top: .35rem;
+    }
+
+    .admin-side-group summary {
+      list-style: none;
+    }
+
+    .admin-side-group summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .admin-side-group-summary {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      min-height: 2.85rem;
+      padding: .65rem .75rem;
+      border-radius: .85rem;
+      color: var(--admin-muted);
+      cursor: pointer;
+      font-size: .9rem;
+      font-weight: 800;
+      user-select: none;
+      transition: background .18s ease, color .18s ease;
+    }
+
+    .admin-side-group-summary:hover,
+    .admin-side-group[open] .admin-side-group-summary,
+    .admin-side-group.active .admin-side-group-summary {
+      background: var(--admin-soft);
+      color: var(--admin-heading);
+    }
+
+    .admin-side-group-chevron {
+      margin-left: auto;
+      font-size: .86rem;
+      transition: transform .18s ease;
+    }
+
+    .admin-side-group[open] .admin-side-group-chevron {
+      transform: rotate(180deg);
+    }
+
+    .admin-side-subnav {
+      display: grid;
+      gap: .18rem;
+      padding: .35rem 0 .25rem 2rem;
+    }
+
+    .admin-side-subnav .admin-side-link {
+      min-height: 2.45rem;
+      padding: .5rem .65rem;
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--admin-muted);
+    }
+
+    .admin-side-subnav .admin-side-link.active {
       color: var(--admin-accent);
     }
 
@@ -168,6 +243,24 @@
   $navActive = $adminActive ?? 'dashboard';
   /** @var \App\Models\User|null $adminUser */
   $adminUser = auth()->user();
+  $adminPrimaryNav = [
+      ['key' => 'dashboard', 'route' => 'admin.dashboard', 'icon' => 'ai-dashboard', 'label' => 'Tableau'],
+      ['key' => 'demandes', 'route' => 'admin.funding-requests.index', 'icon' => 'ai-folder', 'label' => 'Demandes'],
+      ['key' => 'infos', 'route' => 'admin.contacts.index', 'icon' => 'ai-user-group', 'label' => 'Contacts'],
+      ['key' => 'notifications', 'route' => 'admin.email-notifications.index', 'icon' => 'ai-bell', 'label' => 'Notifications'],
+  ];
+  $adminSiteNav = [
+      ['key' => 'settings', 'route' => 'admin.settings.edit', 'icon' => 'ai-settings', 'label' => 'Configuration'],
+      ['key' => 'testimonials', 'route' => 'admin.testimonials.index', 'icon' => 'ai-messages', 'label' => 'Témoignages'],
+  ];
+  $adminToolsNav = [
+      ['key' => 'smtp', 'route' => 'admin.smtp.edit', 'icon' => 'ai-at', 'label' => 'SMTP'],
+      ['key' => 'database', 'route' => 'admin.database.index', 'icon' => 'ai-database', 'label' => 'Base de données'],
+      ['key' => 'guide', 'route' => 'admin.guide', 'icon' => 'ai-open-book', 'label' => 'Guide admin'],
+      ['key' => 'settings-password', 'route' => 'admin.settings.password.edit', 'icon' => 'ai-lock-closed', 'label' => 'Code d’accès'],
+  ];
+  $adminSiteOpen = collect($adminSiteNav)->contains(fn ($item) => $item['key'] === $navActive);
+  $adminToolsOpen = collect($adminToolsNav)->contains(fn ($item) => $item['key'] === $navActive);
 @endphp
 
 <body class="admin-shell">
@@ -202,42 +295,27 @@
               </div>
             </a>
             <div class="dropdown-menu dropdown-menu-end my-1">
-              <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
-                <i class="ai-user-check fs-lg opacity-70 me-2"></i>
-                Tableau de bord
-              </a>
-              <a class="dropdown-item" href="{{ route('admin.funding-requests.index') }}">
-                <i class="ai-folder fs-lg opacity-70 me-2"></i>
-                Toutes les demandes
-              </a>
-              <a class="dropdown-item" href="{{ route('admin.contacts.index') }}">
-                <i class="ai-user-group fs-lg opacity-70 me-2"></i>
-                Infos
-              </a>
-              <a class="dropdown-item" href="{{ route('admin.settings.edit') }}">
-                <i class="ai-settings fs-lg opacity-70 me-2"></i>
-                Configuration
-              </a>
-              <a class="dropdown-item" href="{{ route('admin.testimonials.index') }}">
-                <i class="ai-messages fs-lg opacity-70 me-2"></i>
-                Témoignages
-              </a>
-              <a class="dropdown-item" href="{{ route('admin.settings.password.edit') }}">
-                <i class="ai-lock-closed fs-lg opacity-70 me-2"></i>
-                Code d’accès
-              </a>
-              <a class="dropdown-item" href="{{ route('admin.guide') }}">
-                <i class="ai-open-book fs-lg opacity-70 me-2"></i>
-                Guide admin
-              </a>
-              <a class="dropdown-item" href="{{ route('admin.smtp.edit') }}">
-                <i class="ai-at fs-lg opacity-70 me-2"></i>
-                SMTP
-              </a>
-              <a class="dropdown-item" href="{{ route('admin.database.index') }}">
-                <i class="ai-database fs-lg opacity-70 me-2"></i>
-                Base de données
-              </a>
+              @foreach ($adminPrimaryNav as $item)
+                <a class="dropdown-item" href="{{ route($item['route']) }}">
+                  <i class="{{ $item['icon'] }} fs-lg opacity-70 me-2"></i>
+                  {{ $item['label'] }}
+                </a>
+              @endforeach
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-header">Site</div>
+              @foreach ($adminSiteNav as $item)
+                <a class="dropdown-item" href="{{ route($item['route']) }}">
+                  <i class="{{ $item['icon'] }} fs-lg opacity-70 me-2"></i>
+                  {{ $item['label'] }}
+                </a>
+              @endforeach
+              <div class="dropdown-header">Outils</div>
+              @foreach ($adminToolsNav as $item)
+                <a class="dropdown-item" href="{{ route($item['route']) }}">
+                  <i class="{{ $item['icon'] }} fs-lg opacity-70 me-2"></i>
+                  {{ $item['label'] }}
+                </a>
+              @endforeach
               <div class="dropdown-divider"></div>
               <form method="post" action="{{ route('admin.logout') }}" class="d-grid">
                 @csrf
@@ -267,42 +345,27 @@
                   </div>
                 </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
-                    <i class="ai-user-check fs-lg opacity-70 me-2"></i>
-                    Tableau de bord
-                  </a>
-                  <a class="dropdown-item" href="{{ route('admin.funding-requests.index') }}">
-                    <i class="ai-folder fs-lg opacity-70 me-2"></i>
-                    Toutes les demandes
-                  </a>
-                  <a class="dropdown-item" href="{{ route('admin.contacts.index') }}">
-                    <i class="ai-user-group fs-lg opacity-70 me-2"></i>
-                    Infos
-                  </a>
-                  <a class="dropdown-item" href="{{ route('admin.settings.edit') }}">
-                    <i class="ai-settings fs-lg opacity-70 me-2"></i>
-                    Configuration
-                  </a>
-                  <a class="dropdown-item" href="{{ route('admin.testimonials.index') }}">
-                    <i class="ai-messages fs-lg opacity-70 me-2"></i>
-                    Témoignages
-                  </a>
-                  <a class="dropdown-item" href="{{ route('admin.settings.password.edit') }}">
-                    <i class="ai-lock-closed fs-lg opacity-70 me-2"></i>
-                    Code d’accès
-                  </a>
-                  <a class="dropdown-item" href="{{ route('admin.guide') }}">
-                    <i class="ai-open-book fs-lg opacity-70 me-2"></i>
-                    Guide admin
-                  </a>
-                  <a class="dropdown-item" href="{{ route('admin.smtp.edit') }}">
-                    <i class="ai-at fs-lg opacity-70 me-2"></i>
-                    SMTP
-                  </a>
-                  <a class="dropdown-item" href="{{ route('admin.database.index') }}">
-                    <i class="ai-database fs-lg opacity-70 me-2"></i>
-                    Base de données
-                  </a>
+                  @foreach ($adminPrimaryNav as $item)
+                    <a class="dropdown-item" href="{{ route($item['route']) }}">
+                      <i class="{{ $item['icon'] }} fs-lg opacity-70 me-2"></i>
+                      {{ $item['label'] }}
+                    </a>
+                  @endforeach
+                  <div class="dropdown-divider"></div>
+                  <div class="dropdown-header">Site</div>
+                  @foreach ($adminSiteNav as $item)
+                    <a class="dropdown-item" href="{{ route($item['route']) }}">
+                      <i class="{{ $item['icon'] }} fs-lg opacity-70 me-2"></i>
+                      {{ $item['label'] }}
+                    </a>
+                  @endforeach
+                  <div class="dropdown-header">Outils</div>
+                  @foreach ($adminToolsNav as $item)
+                    <a class="dropdown-item" href="{{ route($item['route']) }}">
+                      <i class="{{ $item['icon'] }} fs-lg opacity-70 me-2"></i>
+                      {{ $item['label'] }}
+                    </a>
+                  @endforeach
                   <div class="dropdown-divider"></div>
                   <form method="post" action="{{ route('admin.logout') }}" class="px-3 py-1">
                     @csrf
@@ -335,44 +398,46 @@
                   <h3 class="h5 mb-1">{{ $adminUser?->name ?? 'Administrateur' }}</h3>
                   <p class="fs-sm text-body-secondary mb-0 text-break">{{ $adminUser?->email }}</p>
                 </div>
-                <nav class="nav flex-column pb-2 pb-lg-4 mb-3">
-                  <h4 class="admin-side-section pb-1 mb-2">Administration</h4>
-                  <a class="admin-side-link fw-semibold {{ $navActive === 'dashboard' ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
-                    <i class="ai-user-check fs-5 opacity-60 me-2"></i>
-                    Tableau de bord
-                  </a>
-                  <a class="admin-side-link fw-semibold {{ $navActive === 'demandes' ? 'active' : '' }}" href="{{ route('admin.funding-requests.index') }}">
-                    <i class="ai-folder fs-5 opacity-60 me-2"></i>
-                    Toutes les demandes
-                  </a>
-                  <a class="admin-side-link fw-semibold {{ $navActive === 'infos' ? 'active' : '' }}" href="{{ route('admin.contacts.index') }}">
-                    <i class="ai-user-group fs-5 opacity-60 me-2"></i>
-                    Infos
-                  </a>
-                  <a class="admin-side-link fw-semibold {{ $navActive === 'settings' ? 'active' : '' }}" href="{{ route('admin.settings.edit') }}">
-                    <i class="ai-settings fs-5 opacity-60 me-2"></i>
-                    Configuration
-                  </a>
-                  <a class="admin-side-link fw-semibold {{ $navActive === 'testimonials' ? 'active' : '' }}" href="{{ route('admin.testimonials.index') }}">
-                    <i class="ai-messages fs-5 opacity-60 me-2"></i>
-                    Témoignages
-                  </a>
-                  <a class="admin-side-link fw-semibold {{ $navActive === 'settings-password' ? 'active' : '' }}" href="{{ route('admin.settings.password.edit') }}">
-                    <i class="ai-lock-closed fs-5 opacity-60 me-2"></i>
-                    Code d’accès
-                  </a>
-                  <a class="admin-side-link fw-semibold {{ $navActive === 'guide' ? 'active' : '' }}" href="{{ route('admin.guide') }}">
-                    <i class="ai-open-book fs-5 opacity-60 me-2"></i>
-                    Guide admin
-                  </a>
-                  <a class="admin-side-link fw-semibold {{ $navActive === 'smtp' ? 'active' : '' }}" href="{{ route('admin.smtp.edit') }}">
-                    <i class="ai-at fs-5 opacity-60 me-2"></i>
-                    SMTP
-                  </a>
-                  <a class="admin-side-link fw-semibold {{ $navActive === 'database' ? 'active' : '' }}" href="{{ route('admin.database.index') }}">
-                    <i class="ai-database fs-5 opacity-60 me-2"></i>
-                    Base de données
-                  </a>
+                <nav class="nav flex-column admin-side-nav pb-2 pb-lg-4 mb-3">
+                  <h4 class="admin-side-section pb-1 mb-2">Principal</h4>
+                  @foreach ($adminPrimaryNav as $item)
+                    <a class="admin-side-link fw-semibold {{ $navActive === $item['key'] ? 'active' : '' }}" href="{{ route($item['route']) }}">
+                      <i class="{{ $item['icon'] }} fs-5 opacity-60"></i>
+                      {{ $item['label'] }}
+                    </a>
+                  @endforeach
+
+                  <details class="admin-side-group {{ $adminSiteOpen ? 'active' : '' }}" {{ $adminSiteOpen ? 'open' : '' }}>
+                    <summary class="admin-side-group-summary">
+                      <i class="ai-settings fs-5 opacity-60"></i>
+                      Site
+                      <i class="ai-chevron-down admin-side-group-chevron"></i>
+                    </summary>
+                    <div class="admin-side-subnav">
+                      @foreach ($adminSiteNav as $item)
+                        <a class="admin-side-link {{ $navActive === $item['key'] ? 'active' : '' }}" href="{{ route($item['route']) }}">
+                          <i class="{{ $item['icon'] }} opacity-60"></i>
+                          {{ $item['label'] }}
+                        </a>
+                      @endforeach
+                    </div>
+                  </details>
+
+                  <details class="admin-side-group {{ $adminToolsOpen ? 'active' : '' }}" {{ $adminToolsOpen ? 'open' : '' }}>
+                    <summary class="admin-side-group-summary">
+                      <i class="ai-tool fs-5 opacity-60"></i>
+                      Outils
+                      <i class="ai-chevron-down admin-side-group-chevron"></i>
+                    </summary>
+                    <div class="admin-side-subnav">
+                      @foreach ($adminToolsNav as $item)
+                        <a class="admin-side-link {{ $navActive === $item['key'] ? 'active' : '' }}" href="{{ route($item['route']) }}">
+                          <i class="{{ $item['icon'] }} opacity-60"></i>
+                          {{ $item['label'] }}
+                        </a>
+                      @endforeach
+                    </div>
+                  </details>
                 </nav>
                 <nav class="nav flex-column">
                   <form method="post" action="{{ route('admin.logout') }}" class="mb-0">

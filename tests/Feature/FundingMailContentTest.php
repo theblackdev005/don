@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Mail\FundingDocumentsReceivedAdminMail;
 use App\Mail\FundingPreliminaryAcceptedMail;
 use App\Mail\FundingRequestReceivedApplicantMail;
 use App\Mail\FundingRequestRefusedMail;
@@ -42,6 +43,23 @@ class FundingMailContentTest extends TestCase
             route('funding-request.documents', [
                 'locale' => 'fr',
                 'public_slug' => $fundingRequest->public_slug,
+            ]),
+            $html
+        );
+    }
+
+    public function test_documents_received_admin_mail_renders_admin_link(): void
+    {
+        $fundingRequest = FundingRequest::factory()->create([
+            'locale' => 'fr',
+        ]);
+
+        $html = (new FundingDocumentsReceivedAdminMail($fundingRequest))->render();
+
+        $this->assertStringContainsString(
+            route('admin.funding-requests.show', [
+                'locale' => 'fr',
+                'fundingRequest' => $fundingRequest,
             ]),
             $html
         );

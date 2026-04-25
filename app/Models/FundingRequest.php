@@ -149,6 +149,11 @@ class FundingRequest extends Model
         return $this->hasMany(FundingRequestFinancialChange::class);
     }
 
+    public function emailNotifications(): HasMany
+    {
+        return $this->hasMany(EmailNotification::class);
+    }
+
     public static function statusLabels(): array
     {
         return [

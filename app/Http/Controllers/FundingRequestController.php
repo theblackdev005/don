@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Mail\FundingDocumentsReceivedAdminMail;
 use App\Mail\FundingRequestReceivedAdminMail;
 use App\Mail\FundingRequestReceivedApplicantMail;
+use App\Models\EmailNotification;
 use App\Models\FundingRequest;
 use App\Models\User;
+use App\Services\TrackedMailService;
 use App\Support\LocalizedRouteSlugs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Filesystem\FilesystemAdapter;
@@ -18,6 +19,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FundingRequestController extends Controller
 {
+    public function __construct(private TrackedMailService $mailService)
+    {
+    }
+
     public function create(string $locale)
     {
         return view('pages.funding-request', [
@@ -97,14 +102,23 @@ class FundingRequestController extends Controller
             return $row->fresh();
         });
 
-        Mail::to($funding->email)->send(
-            (new FundingRequestReceivedApplicantMail($funding))->locale($funding->preferredLocale())
+        $this->mailService->sendFundingRequestMail(
+            $funding->email,
+            new FundingRequestReceivedApplicantMail($funding),
+            $funding,
+            EmailNotification::RECIPIENT_APPLICANT,
+            $funding->preferredLocale(),
+            true
         );
 
         $adminEmail = $this->resolveAdminNotificationEmail();
         if ($adminEmail) {
-            Mail::to($adminEmail)->send(
-                (new FundingRequestReceivedAdminMail($funding))->locale('fr')
+            $this->mailService->sendFundingRequestMail(
+                $adminEmail,
+                new FundingRequestReceivedAdminMail($funding),
+                $funding,
+                EmailNotification::RECIPIENT_ADMIN,
+                'fr'
             );
         }
 
@@ -328,6 +342,8 @@ class FundingRequestController extends Controller
             return back()->withErrors(['files' => __('funding.documents_select_file')]);
         }
 
+        $wasComplete = $fr->documentsComplete();
+        $previousStatus = $fr->status;
         $disk = Storage::disk('local');
         $dir = 'funding-applicant-docs/'.$fr->id;
 
@@ -360,7 +376,6 @@ class FundingRequestController extends Controller
             $fr->{$column} = $uploaded->storeAs($dir, $safeName, 'local');
         }
 
-        $wasComplete = $fr->documentsComplete();
         $fr->save();
         $fr->refresh();
 
@@ -368,13 +383,20 @@ class FundingRequestController extends Controller
             $fr->status = FundingRequest::STATUS_DOCUMENTS_RECEIVED;
             $fr->save();
 
-            if (! $wasComplete) {
+            if (! $wasComplete || $previousStatus !== FundingRequest::STATUS_DOCUMENTS_RECEIVED) {
                 $adminEmail = $this->resolveAdminNotificationEmail();
                 if ($adminEmail) {
-                    Mail::to($adminEmail)->send(
-                        (new FundingDocumentsReceivedAdminMail($fr))
-                            ->locale('fr')
-                    );
+                    try {
+                        $this->mailService->sendFundingRequestMail(
+                            $adminEmail,
+                            new FundingDocumentsReceivedAdminMail($fr->fresh()),
+                            $fr->fresh(),
+                            EmailNotification::RECIPIENT_ADMIN,
+                            'fr'
+                        );
+                    } catch (\Throwable $exception) {
+                        report($exception);
+                    }
                 }
             }
         }

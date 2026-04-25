@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\DatabaseAdminController;
+use App\Http\Controllers\Admin\EmailNotificationAdminController;
 use App\Http\Controllers\Admin\FundingRequestAdminController;
 use App\Http\Controllers\Admin\SiteSettingsController;
 use App\Http\Controllers\Admin\SmtpSettingsController;
@@ -198,6 +199,9 @@ Route::prefix('{locale}')->whereIn('locale', $supportedLocales)->group(function 
             Route::get('smtp', [SmtpSettingsController::class, 'edit'])->name('smtp.edit');
             Route::post('smtp', [SmtpSettingsController::class, 'update'])->name('smtp.update');
             Route::post('smtp/test', [SmtpSettingsController::class, 'sendTest'])->name('smtp.test');
+            Route::get('notifications-email', [EmailNotificationAdminController::class, 'index'])->name('email-notifications.index');
+            Route::post('notifications-email/{emailNotification}/renvoyer', [EmailNotificationAdminController::class, 'retry'])
+                ->name('email-notifications.retry');
             Route::get('temoignages', [TestimonialAdminController::class, 'index'])->name('testimonials.index');
             Route::post('temoignages', [TestimonialAdminController::class, 'store'])->name('testimonials.store');
             Route::put('temoignages/{testimonial}', [TestimonialAdminController::class, 'update'])->name('testimonials.update');

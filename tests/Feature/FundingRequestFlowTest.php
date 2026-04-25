@@ -4,11 +4,13 @@ namespace Tests\Feature;
 
 use App\Mail\FundingDonationActMail;
 use App\Mail\FundingDonationActSentAdminMail;
+use App\Mail\FundingDocumentsReceivedAdminMail;
 use App\Mail\FundingPreliminaryAcceptedMail;
 use App\Mail\FundingPreliminarySentAdminMail;
 use App\Mail\FundingRequestReceivedAdminMail;
 use App\Mail\FundingRequestReceivedApplicantMail;
 use App\Mail\FundingRequestRefusedMail;
+use App\Models\EmailNotification;
 use App\Models\FundingRequest;
 use App\Models\FundingRequestFinancialChange;
 use App\Models\User;
@@ -70,6 +72,20 @@ class FundingRequestFlowTest extends TestCase
         Mail::assertSent(FundingRequestReceivedAdminMail::class, function ($mail) use ($admin) {
             return $mail->hasTo($admin->email);
         });
+
+        $this->assertDatabaseHas('email_notifications', [
+            'funding_request_id' => $fundingRequest->id,
+            'recipient_email' => 'jean@example.test',
+            'mailable_class' => FundingRequestReceivedApplicantMail::class,
+            'status' => EmailNotification::STATUS_SENT,
+        ]);
+
+        $this->assertDatabaseHas('email_notifications', [
+            'funding_request_id' => $fundingRequest->id,
+            'recipient_email' => $admin->email,
+            'mailable_class' => FundingRequestReceivedAdminMail::class,
+            'status' => EmailNotification::STATUS_SENT,
+        ]);
     }
 
     public function test_customer_cannot_submit_twice_with_same_email(): void
@@ -141,6 +157,11 @@ class FundingRequestFlowTest extends TestCase
             'status' => FundingRequest::STATUS_AWAITING_DOCUMENTS,
             'identity_document_type' => FundingRequest::IDENTITY_DOCUMENT_ID_CARD,
         ]);
+        $admin = User::factory()->create([
+            'is_admin' => true,
+            'email' => 'admin-documents@example.test',
+        ]);
+        config(['admin.notification_email' => $admin->email]);
 
         $response = $this->post(route('funding-request.documents.store', [
             'locale' => 'fr',
@@ -166,6 +187,18 @@ class FundingRequestFlowTest extends TestCase
         $this->assertNotNull($fundingRequest->doc_situation_path);
         Storage::disk('local')->assertExists($fundingRequest->doc_id_front_path);
         Storage::disk('local')->assertExists($fundingRequest->doc_id_back_path);
+
+        Mail::assertSent(FundingDocumentsReceivedAdminMail::class, function ($mail) use ($admin, $fundingRequest) {
+            return $mail->hasTo($admin->email)
+                && $mail->fundingRequest->is($fundingRequest);
+        });
+
+        $this->assertDatabaseHas('email_notifications', [
+            'funding_request_id' => $fundingRequest->id,
+            'recipient_email' => $admin->email,
+            'mailable_class' => FundingDocumentsReceivedAdminMail::class,
+            'status' => EmailNotification::STATUS_SENT,
+        ]);
     }
 
     public function test_admin_can_refuse_with_reason_and_reactivate(): void
@@ -352,6 +385,100 @@ class FundingRequestFlowTest extends TestCase
         $updateResponse->assertSessionHasNoErrors();
         $this->assertSame('72000.00', $fundingRequest->amount_requested);
         $this->assertSame('Correction directe via la base.', $fundingRequest->admin_notes);
+    }
+
+    public function test_admin_dashboard_highlights_priorities_without_overloading(): void
+    {
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+
+        $pendingRequest = FundingRequest::factory()->create([
+            'status' => FundingRequest::STATUS_PENDING,
+            'full_name' => 'Client à examiner',
+        ]);
+
+        FundingRequest::factory()->create([
+            'status' => FundingRequest::STATUS_DOCUMENTS_RECEIVED,
+        ]);
+
+        EmailNotification::query()->create([
+            'funding_request_id' => $pendingRequest->id,
+            'recipient_email' => 'admin@example.test',
+            'recipient_type' => EmailNotification::RECIPIENT_ADMIN,
+            'mailable_class' => FundingDocumentsReceivedAdminMail::class,
+            'subject' => 'Documents reçus',
+            'locale' => 'fr',
+            'status' => EmailNotification::STATUS_FAILED,
+            'attempts' => 1,
+            'last_error' => 'SMTP indisponible',
+            'last_attempt_at' => now(),
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->get(route('admin.dashboard', ['locale' => 'fr']));
+
+        $response->assertOk();
+        $response->assertSee('Actions prioritaires');
+        $response->assertSee('Demandes à examiner');
+        $response->assertSee('Dossiers complets');
+        $response->assertSee('Emails échoués');
+        $response->assertSee('Pièces reçues');
+    }
+
+    public function test_admin_can_view_and_retry_failed_email_notifications(): void
+    {
+        Mail::fake();
+
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+
+        $fundingRequest = FundingRequest::factory()->create([
+            'status' => FundingRequest::STATUS_DOCUMENTS_RECEIVED,
+        ]);
+
+        $notification = EmailNotification::query()->create([
+            'funding_request_id' => $fundingRequest->id,
+            'recipient_email' => 'admin-docs@example.test',
+            'recipient_type' => EmailNotification::RECIPIENT_ADMIN,
+            'mailable_class' => FundingDocumentsReceivedAdminMail::class,
+            'subject' => 'Documents reçus',
+            'locale' => 'fr',
+            'status' => EmailNotification::STATUS_FAILED,
+            'attempts' => 1,
+            'last_error' => 'SMTP indisponible',
+            'last_attempt_at' => now(),
+        ]);
+
+        $indexResponse = $this->actingAs($admin)
+            ->get(route('admin.email-notifications.index', ['locale' => 'fr']));
+
+        $indexResponse->assertOk();
+        $indexResponse->assertSee('Notifications e-mail');
+        $indexResponse->assertSee('SMTP indisponible');
+        $indexResponse->assertSee('Renvoyer');
+
+        $retryResponse = $this->from(route('admin.email-notifications.index', ['locale' => 'fr']))
+            ->actingAs($admin)
+            ->post(route('admin.email-notifications.retry', [
+                'locale' => 'fr',
+                'emailNotification' => $notification,
+            ]));
+
+        $notification->refresh();
+
+        $retryResponse->assertRedirect(route('admin.email-notifications.index', ['locale' => 'fr']));
+        $retryResponse->assertSessionHasNoErrors();
+        $this->assertSame(EmailNotification::STATUS_SENT, $notification->status);
+        $this->assertSame(2, $notification->attempts);
+        $this->assertNull($notification->last_error);
+        $this->assertNotNull($notification->sent_at);
+
+        Mail::assertSent(FundingDocumentsReceivedAdminMail::class, function ($mail) use ($fundingRequest) {
+            return $mail->hasTo('admin-docs@example.test')
+                && $mail->fundingRequest->is($fundingRequest);
+        });
     }
 
     public function test_admin_can_send_preliminary_validation_and_move_dossier_to_documents_stage(): void

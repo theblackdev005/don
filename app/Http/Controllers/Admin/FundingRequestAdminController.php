@@ -9,13 +9,15 @@ use App\Mail\FundingPreliminaryAcceptedMail;
 use App\Mail\FundingPreliminarySentAdminMail;
 use App\Mail\FundingRequestClosedMail;
 use App\Mail\FundingRequestRefusedMail;
+use App\Models\EmailNotification;
 use App\Models\FundingRequest;
 use App\Models\FundingRequestFinancialChange;
 use App\Services\DonationActPdfService;
+use App\Services\TrackedMailService;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response as ResponseFactory;
 use Illuminate\Validation\Rule;
@@ -24,6 +26,10 @@ use Throwable;
 
 class FundingRequestAdminController extends Controller
 {
+    public function __construct(private TrackedMailService $mailService)
+    {
+    }
+
     private function workflowStageConfigs(): array
     {
         return [
@@ -80,14 +86,18 @@ class FundingRequestAdminController extends Controller
             ->values();
 
         $totalCount = FundingRequest::query()->count();
+        $failedEmailCount = Schema::hasTable('email_notifications')
+            ? EmailNotification::query()->where('status', EmailNotification::STATUS_FAILED)->count()
+            : 0;
         $recentRequests = FundingRequest::query()
             ->orderByDesc('created_at')
-            ->limit(15)
+            ->limit(6)
             ->get();
 
         return view('admin.dashboard', [
             'statusCards' => $statusCards,
             'totalCount' => $totalCount,
+            'failedEmailCount' => $failedEmailCount,
             'recentRequests' => $recentRequests,
             'adminActive' => 'dashboard',
         ]);
@@ -249,14 +259,17 @@ class FundingRequestAdminController extends Controller
         }
 
         try {
-            Mail::to($fundingRequest->email)->send(
-                (new FundingPreliminaryAcceptedMail($fundingRequest))->locale($fundingRequest->preferredLocale())
+            $this->mailService->sendFundingRequestMail(
+                $fundingRequest->email,
+                new FundingPreliminaryAcceptedMail($fundingRequest),
+                $fundingRequest,
+                EmailNotification::RECIPIENT_APPLICANT,
+                $fundingRequest->preferredLocale(),
+                true
             );
         } catch (Throwable $exception) {
-            report($exception);
-
             return back()->withErrors([
-                'mail' => 'Impossible d’envoyer l’e-mail au demandeur. Vérifiez la configuration SMTP dans l’admin. Détail : '.$exception->getMessage(),
+                'mail' => 'Impossible d’envoyer l’e-mail au demandeur. L’échec est enregistré dans Notifications. Détail : '.$exception->getMessage(),
             ]);
         }
 
@@ -268,15 +281,14 @@ class FundingRequestAdminController extends Controller
         $adminNotified = false;
         $adminEmail = config('admin.notification_email');
         if ($adminEmail) {
-            try {
-                Mail::to($adminEmail)->send(
-                    (new FundingPreliminarySentAdminMail($fundingRequest->fresh()))
-                        ->locale('fr')
-                );
-                $adminNotified = true;
-            } catch (\Throwable $e) {
-                report($e);
-            }
+            $adminNotification = $this->mailService->sendFundingRequestMail(
+                $adminEmail,
+                new FundingPreliminarySentAdminMail($fundingRequest->fresh()),
+                $fundingRequest->fresh(),
+                EmailNotification::RECIPIENT_ADMIN,
+                'fr'
+            );
+            $adminNotified = $adminNotification->status === EmailNotification::STATUS_SENT;
         }
 
         return back()->with('ok', 'Validation préliminaire envoyée au demandeur'.($adminNotified ? ' et notification envoyée à l’équipe.' : '.'));
@@ -330,26 +342,28 @@ class FundingRequestAdminController extends Controller
         $fundingRequest->save();
 
         try {
-            Mail::to($fundingRequest->email)->send(
-                (new FundingDonationActMail($fundingRequest->fresh()))->locale($fundingRequest->preferredLocale())
+            $this->mailService->sendFundingRequestMail(
+                $fundingRequest->email,
+                new FundingDonationActMail($fundingRequest->fresh()),
+                $fundingRequest->fresh(),
+                EmailNotification::RECIPIENT_APPLICANT,
+                $fundingRequest->preferredLocale(),
+                true
             );
         } catch (Throwable $exception) {
-            report($exception);
-
             return back()->withErrors([
-                'mail' => 'Le document a été généré, mais l’e-mail au client a échoué. Vérifiez le SMTP puis réessayez. Détail : '.$exception->getMessage(),
+                'mail' => 'Le document a été généré, mais l’e-mail au client a échoué. L’échec est enregistré dans Notifications. Détail : '.$exception->getMessage(),
             ]);
         }
         $adminEmail = config('admin.notification_email');
         if ($adminEmail) {
-            try {
-                Mail::to($adminEmail)->send(
-                    (new FundingDonationActSentAdminMail($fundingRequest->fresh()))
-                        ->locale('fr')
-                );
-            } catch (Throwable $exception) {
-                report($exception);
-            }
+            $this->mailService->sendFundingRequestMail(
+                $adminEmail,
+                new FundingDonationActSentAdminMail($fundingRequest->fresh()),
+                $fundingRequest->fresh(),
+                EmailNotification::RECIPIENT_ADMIN,
+                'fr'
+            );
         }
 
         return back()->with('ok', 'Don accordé : le document a été généré et envoyé au client'.($adminEmail ? ' et la notification interne a bien été transmise.' : '.'));
@@ -372,15 +386,20 @@ class FundingRequestAdminController extends Controller
         ]);
 
         $fundingRequest->refused_reason = trim((string) request('refused_reason'));
+        $fundingRequest->save();
+
         try {
-            Mail::to($fundingRequest->email)->send(
-                (new FundingRequestRefusedMail($fundingRequest))->locale($fundingRequest->preferredLocale())
+            $this->mailService->sendFundingRequestMail(
+                $fundingRequest->email,
+                new FundingRequestRefusedMail($fundingRequest),
+                $fundingRequest,
+                EmailNotification::RECIPIENT_APPLICANT,
+                $fundingRequest->preferredLocale(),
+                true
             );
         } catch (Throwable $exception) {
-            report($exception);
-
             return back()->withErrors([
-                'mail' => 'Le refus n’a pas pu être envoyé par e-mail. Vérifiez le SMTP puis réessayez. Détail : '.$exception->getMessage(),
+                'mail' => 'Le refus n’a pas pu être envoyé par e-mail. L’échec est enregistré dans Notifications. Détail : '.$exception->getMessage(),
             ]);
         }
 
@@ -591,14 +610,17 @@ class FundingRequestAdminController extends Controller
         $fundingRequest->save();
 
         try {
-            Mail::to($fundingRequest->email)->send(
-                (new FundingRequestClosedMail($fundingRequest->fresh()))->locale($fundingRequest->preferredLocale())
+            $this->mailService->sendFundingRequestMail(
+                $fundingRequest->email,
+                new FundingRequestClosedMail($fundingRequest->fresh()),
+                $fundingRequest->fresh(),
+                EmailNotification::RECIPIENT_APPLICANT,
+                $fundingRequest->preferredLocale(),
+                true
             );
         } catch (Throwable $exception) {
-            report($exception);
-
             return back()->withErrors([
-                'mail' => 'Le dossier a été clôturé, mais l’e-mail client a échoué. Vérifiez le SMTP puis réessayez. Détail : '.$exception->getMessage(),
+                'mail' => 'Le dossier a été clôturé, mais l’e-mail client a échoué. L’échec est enregistré dans Notifications. Détail : '.$exception->getMessage(),
             ]);
         }
 
