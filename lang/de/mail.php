@@ -61,7 +61,7 @@ return array_replace_recursive(require __DIR__.'/../en/mail.php', [
         'p2' => 'Anbei finden Sie Ihre <strong>Schenkungsurkunde</strong> als PDF.',
         'p3' => 'Wir bitten Sie:',
         'ol1' => 'Das Dokument auszudrucken und an den gekennzeichneten Stellen zu unterschreiben;',
-        'ol2' => 'Uns die unterschriebene Version (Scan oder gut lesbares Foto) per Antwort auf diese E-Mail oder gemäß den Anweisungen Ihres Betreuers zuzusenden.',
+        'ol2' => 'Uns die unterschriebene Version (Scan oder gut lesbares Foto) per Antwort auf diese E-Mail zuzusenden.',
         'p4' => 'Wenn Sie keinen Anhang sehen, prüfen Sie den Spam-Ordner oder kontaktieren Sie uns.',
         'regards' => 'Mit freundlichen Grüßen,',
         'attachment_name' => 'schenkungsurkunde-:number.pdf',
@@ -98,7 +98,7 @@ return array_replace_recursive(require __DIR__.'/../en/mail.php', [
         'amount_label' => 'Genehmigter Betrag:',
         'p1' => 'Ihr Finanzierungsantrag <strong>:number</strong> wurde erfolgreich bearbeitet.',
         'p2' => 'Der Betrag von <strong>:amount</strong> wurde genehmigt, und alles ist nun für die Überweisung der Mittel vorbereitet.',
-        'p3' => 'Bitte wenden Sie sich für den nächsten Schritt an den zuständigen Sachbearbeiter oder an die Finanzierungsleitung, um die Mittel zu erhalten.',
+        'p3' => 'Für die Organisation der Überweisung senden Sie uns bitte: vollständiger Name des Kontoinhabers, Name der Bank, IBAN oder Kontonummer, BIC/SWIFT-Code.',
         'regards' => 'Mit freundlichen Grüßen,',
     ],
     'refused' => [

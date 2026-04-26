@@ -134,6 +134,76 @@
       font-weight: 800;
     }
 
+    .admin-stage-doc-decision {
+      min-width: 13rem;
+    }
+
+    .admin-stage-doc-toggle {
+      display: block;
+      width: 100%;
+      margin: 0;
+    }
+
+    .admin-stage-doc-toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .admin-stage-doc-toggle-track {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 2.45rem;
+      padding: .25rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(15, 23, 42, 0.06);
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .admin-stage-doc-toggle-option {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 1.9rem;
+      color: var(--stage-muted);
+      font-size: .72rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .admin-stage-doc-toggle-thumb {
+      position: absolute;
+      z-index: 1;
+      inset: .25rem auto .25rem .25rem;
+      width: calc(50% - .3rem);
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.13);
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    .admin-stage-doc-toggle input:not(:checked) + .admin-stage-doc-toggle-track .admin-stage-doc-toggle-option:first-child,
+    .admin-stage-doc-toggle input:checked + .admin-stage-doc-toggle-track .admin-stage-doc-toggle-option:last-child {
+      color: var(--stage-heading);
+    }
+
+    .admin-stage-doc-toggle input:checked + .admin-stage-doc-toggle-track {
+      background: rgba(25, 135, 84, 0.13);
+      border-color: rgba(25, 135, 84, 0.22);
+    }
+
+    .admin-stage-doc-toggle input:checked + .admin-stage-doc-toggle-track .admin-stage-doc-toggle-thumb {
+      transform: translateX(calc(100% + .1rem));
+      background: #dcfce7;
+    }
+
     .admin-stage-empty {
       padding: 2.5rem 1.5rem;
       text-align: center;
@@ -235,6 +305,21 @@
               <form method="post" action="{{ route('admin.funding-requests.preliminary', $requestItem) }}">
                 @csrf
                 <button type="submit" class="btn btn-primary">Valider la demande</button>
+              </form>
+            @elseif ($stageConfig['primary_action'] === 'documents' && $requestItem->documentsComplete())
+              <form method="post" action="{{ route('admin.funding-requests.documents-decision', $requestItem) }}" class="admin-stage-doc-decision d-grid gap-2">
+                @csrf
+                <input type="hidden" name="documents_decision" value="correction">
+                <label class="admin-stage-doc-toggle" for="documents-decision-{{ $requestItem->id }}">
+                  <input type="checkbox" role="switch" id="documents-decision-{{ $requestItem->id }}" name="documents_decision" value="valid">
+                  <span class="admin-stage-doc-toggle-track" aria-hidden="true">
+                    <span class="admin-stage-doc-toggle-option">À refaire</span>
+                    <span class="admin-stage-doc-toggle-option">Conforme</span>
+                    <span class="admin-stage-doc-toggle-thumb"></span>
+                  </span>
+                  <span class="visually-hidden">Pièces conformes</span>
+                </label>
+                <button type="submit" class="btn btn-primary">Confirmer</button>
               </form>
             @elseif ($stageConfig['primary_action'] === 'send_act')
               <form method="post" action="{{ route('admin.funding-requests.send-act', $requestItem) }}">

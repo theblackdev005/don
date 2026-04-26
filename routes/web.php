@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\DatabaseAdminController;
 use App\Http\Controllers\Admin\EmailNotificationAdminController;
 use App\Http\Controllers\Admin\FundingRequestAdminController;
+use App\Http\Controllers\Admin\AdminMessageTemplateController;
 use App\Http\Controllers\Admin\SiteSettingsController;
 use App\Http\Controllers\Admin\SmtpSettingsController;
 use App\Http\Controllers\Admin\TestimonialAdminController;
@@ -175,6 +176,10 @@ Route::prefix('{locale}')->whereIn('locale', $supportedLocales)->group(function 
                 ->name('funding-requests.preliminary');
             Route::post('demandes/{fundingRequest}/pieces-recue', [FundingRequestAdminController::class, 'markDocumentsReceived'])
                 ->name('funding-requests.documents-received');
+            Route::post('demandes/{fundingRequest}/pieces-a-refaire', [FundingRequestAdminController::class, 'requestDocumentsCorrection'])
+                ->name('funding-requests.documents-correction');
+            Route::post('demandes/{fundingRequest}/decision-pieces', [FundingRequestAdminController::class, 'decideDocuments'])
+                ->name('funding-requests.documents-decision');
             Route::post('demandes/{fundingRequest}/envoyer-acte', [FundingRequestAdminController::class, 'generateAndSendDonationAct'])
                 ->name('funding-requests.send-act');
             Route::post('demandes/{fundingRequest}/refuser', [FundingRequestAdminController::class, 'refuse'])
@@ -194,6 +199,8 @@ Route::prefix('{locale}')->whereIn('locale', $supportedLocales)->group(function 
             Route::get('configuration', [SiteSettingsController::class, 'edit'])->name('settings.edit');
             Route::post('configuration', [SiteSettingsController::class, 'update'])->name('settings.update');
             Route::get('configuration/apercu-acte', [SiteSettingsController::class, 'previewDonationAct'])->name('settings.preview-donation-act');
+            Route::get('modeles-messages', [AdminMessageTemplateController::class, 'edit'])->name('message-templates.edit');
+            Route::post('modeles-messages', [AdminMessageTemplateController::class, 'update'])->name('message-templates.update');
             Route::get('configuration/mot-de-passe', [SiteSettingsController::class, 'editPassword'])->name('settings.password.edit');
             Route::post('configuration/mot-de-passe', [SiteSettingsController::class, 'updatePassword'])->name('settings.password.update');
             Route::get('smtp', [SmtpSettingsController::class, 'edit'])->name('smtp.edit');

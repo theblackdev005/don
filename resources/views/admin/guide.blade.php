@@ -277,15 +277,15 @@
         <li class="admin-guide-item">
           <span class="admin-guide-index">B</span>
           <div>
-            <strong>En attente des pièces</strong>
-            <span>Le client a reçu le lien personnel et doit encore transmettre les justificatifs demandés.</span>
+            <strong>Pièces à compléter ou vérifier</strong>
+            <span>Le client peut encore déposer ou remplacer ses justificatifs. L’admin valide les pièces quand elles sont correctes.</span>
           </div>
         </li>
         <li class="admin-guide-item">
           <span class="admin-guide-index">C</span>
           <div>
-            <strong>Pièces reçues</strong>
-            <span>Les documents obligatoires sont présents et le dossier est prêt pour la décision finale.</span>
+            <strong>Pièces validées</strong>
+            <span>Les documents obligatoires ont été approuvés et le dossier est prêt pour la décision finale.</span>
           </div>
         </li>
         <li class="admin-guide-item">

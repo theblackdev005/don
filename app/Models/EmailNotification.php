@@ -91,7 +91,7 @@ class EmailNotification extends Model
             FundingRequestReceivedAdminMail::class => 'Nouvelle demande admin',
             FundingPreliminaryAcceptedMail::class => 'Validation préliminaire',
             FundingPreliminarySentAdminMail::class => 'Validation envoyée admin',
-            FundingDocumentsReceivedAdminMail::class => 'Documents reçus admin',
+            FundingDocumentsReceivedAdminMail::class => 'Pièces déposées admin',
             FundingDonationActMail::class => 'Acte de donation client',
             FundingDonationActSentAdminMail::class => 'Acte envoyé admin',
             FundingRequestRefusedMail::class => 'Refus du dossier',

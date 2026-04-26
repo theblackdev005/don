@@ -61,7 +61,7 @@ return array_replace_recursive(require __DIR__.'/../en/mail.php', [
         'p2' => 'Adjunto encontrará su <strong>acta de donación</strong> en formato PDF.',
         'p3' => 'Le rogamos que:',
         'ol1' => 'Imprima y firme el documento en los lugares indicados;',
-        'ol2' => 'Nos devuelva la versión firmada (escaneo o foto legible) respondiendo a este correo o según las instrucciones de su gestor.',
+        'ol2' => 'Nos devuelva la versión firmada (escaneo o foto legible) respondiendo a este correo.',
         'p4' => 'Si no ve el adjunto, compruebe el spam o contáctenos.',
         'regards' => 'Atentamente,',
         'attachment_name' => 'acta-donacion-:number.pdf',
@@ -98,7 +98,7 @@ return array_replace_recursive(require __DIR__.'/../en/mail.php', [
         'amount_label' => 'Importe aprobado:',
         'p1' => 'Su solicitud de financiación <strong>:number</strong> ha sido tramitada con éxito.',
         'p2' => 'El importe de <strong>:amount</strong> ha sido aprobado y todo está listo para la transferencia de los fondos.',
-        'p3' => 'Para continuar, póngase en contacto con el gestor encargado de su expediente o con la dirección de financiación para recibir los fondos.',
+        'p3' => 'Para organizar la transferencia, le rogamos que nos envíe: nombre completo del titular de la cuenta, nombre del banco, IBAN o número de cuenta, código BIC/SWIFT.',
         'regards' => 'Atentamente,',
     ],
     'refused' => [

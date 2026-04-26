@@ -75,6 +75,8 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
     'documents_already_complete' => 'Todos los documentos requeridos ya han sido recibidos.',
     'documents_select_file' => 'Por favor seleccione al menos un archivo para subir.',
     'documents_link_not_needed' => 'Enlace de documentos no requerido.',
+    'documents_pending_review' => 'Sus documentos están pendientes de verificación.',
+    'documents_upload_unavailable' => 'La carga de documentos ya no está disponible.',
     'tracking_not_found' => 'Número de expediente no encontrado. Por favor verifique el número ingresado.',
     'current_situation' => [
         'salaried' => 'Asalariado',
@@ -129,7 +131,7 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
         ],
         'donation_act_sent' => [
             'headline' => 'Acta de donación enviada',
-            'body' => 'Se le ha enviado por correo un acta de donación (PDF). Consúltela y siga las instrucciones de su gestor.',
+            'body' => 'Se le ha enviado por correo un acta de donación (PDF). Le rogamos que la consulte, la firme y nos devuelva una copia legible.',
         ],
         'refused' => [
             'headline' => 'Solicitud no aprobada',

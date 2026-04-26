@@ -26,16 +26,16 @@
       'tone' => 'warning',
     ],
     [
-      'title' => 'Dossiers en attente de pièces',
-      'text' => 'Suivez les clients qui doivent encore déposer leurs justificatifs.',
+      'title' => 'Pièces à compléter ou vérifier',
+      'text' => 'Suivez les dépôts clients et validez les pièces complètes avant la décision.',
       'count' => $awaitingCount,
       'route' => 'documents',
-      'button' => 'Suivre les dossiers',
+      'button' => 'Vérifier les pièces',
       'tone' => 'info',
     ],
     [
-      'title' => 'Dossiers complets',
-      'text' => 'Les pièces sont reçues. Vous pouvez vérifier et décider.',
+      'title' => 'Pièces validées',
+      'text' => 'Les pièces sont approuvées. Vous pouvez décider et envoyer le document.',
       'count' => $documentsCount,
       'route' => 'decision',
       'button' => 'Décider maintenant',
@@ -346,7 +346,7 @@
     </div>
     <div class="col-6 col-xl-3">
       <a class="admin-dashboard-card admin-dashboard-card-link" href="{{ route('admin.workflow', ['stage' => 'decision']) }}">
-        <div class="admin-dashboard-stat-label">Pièces reçues</div>
+        <div class="admin-dashboard-stat-label">Pièces validées</div>
         <div class="admin-dashboard-stat-value text-success">{{ $documentsCount }}</div>
         <p class="admin-dashboard-stat-note">Dossiers prêts pour décision</p>
       </a>

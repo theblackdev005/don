@@ -75,6 +75,8 @@ return [
     'documents_already_complete' => 'Kaikki vaaditut asiakirjat on jo vastaanotettu.',
     'documents_select_file' => 'Valitse vähintään yksi ladattava tiedosto.',
     'documents_link_not_needed' => 'Asiakirjalinkkiä ei tarvita.',
+    'documents_pending_review' => 'Asiakirjasi odottavat tarkistusta.',
+    'documents_upload_unavailable' => 'Asiakirjojen lähettäminen ei ole enää käytettävissä.',
     'tracking_not_found' => 'Hakemusnumeroa ei löytynyt. Tarkista syöttämäsi numero.',
     'current_situation' => [
         'salaried' => 'Palkansaaja',
@@ -129,7 +131,7 @@ return [
         ],
         'donation_act_sent' => [
             'headline' => 'Lahjoituskirja lähetetty',
-            'body' => 'Sinulle on lähetetty sähköpostitse lahjoituskirja (PDF). Tutustu siihen ja noudata käsittelijäsi lähettämiä ohjeita.',
+            'body' => 'Sinulle on lähetetty sähköpostitse lahjoituskirja (PDF). Tutustu siihen, allekirjoita se ja palauta meille luettava kopio.',
         ],
         'refused' => [
             'headline' => 'Hakemusta ei hyväksytty',

@@ -75,6 +75,8 @@ return [
     'documents_already_complete' => 'Alle vereiste documenten zijn al ontvangen.',
     'documents_select_file' => 'Selecteer minstens één bestand om te uploaden.',
     'documents_link_not_needed' => 'Documentlink niet vereist.',
+    'documents_pending_review' => 'Uw documenten wachten op verificatie.',
+    'documents_upload_unavailable' => 'Het uploaden van documenten is niet meer beschikbaar.',
     'tracking_not_found' => 'Dossiernummer niet gevonden. Controleer het ingevoerde nummer.',
     'current_situation' => [
         'salaried' => 'Werknemer',
@@ -129,7 +131,7 @@ return [
         ],
         'donation_act_sent' => [
             'headline' => 'Schenkingsakte verzonden',
-            'body' => 'Een schenkingsakte (PDF) werd u per e-mail toegestuurd. Gelieve deze te raadplegen en de instructies van uw dossierbeheerder te volgen.',
+            'body' => 'Een schenkingsakte (PDF) werd u per e-mail toegestuurd. Gelieve deze te lezen, te ondertekenen en ons een leesbare kopie terug te sturen.',
         ],
         'refused' => [
             'headline' => 'Aanvraag niet weerhouden',

@@ -487,6 +487,110 @@
       margin: 0;
     }
 
+    .admin-doc-decision {
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 1rem;
+      background: var(--detail-soft);
+      padding: .9rem .95rem;
+      display: grid;
+      gap: .75rem;
+    }
+
+    .admin-doc-decision-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .85rem;
+    }
+
+    .admin-doc-decision-label {
+      color: var(--detail-heading);
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .admin-doc-decision-note {
+      color: var(--detail-muted);
+      font-size: .8rem;
+      line-height: 1.4;
+      margin-top: .15rem;
+    }
+
+    .admin-doc-toggle {
+      display: block;
+      min-width: 12.75rem;
+      margin: 0;
+    }
+
+    .admin-doc-toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .admin-doc-toggle-track {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .2rem;
+      min-height: 2.45rem;
+      padding: .25rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.08);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      cursor: pointer;
+      overflow: hidden;
+      box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
+    }
+
+    .admin-doc-toggle-option {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 1.9rem;
+      border-radius: 999px;
+      color: var(--detail-muted);
+      font-size: .76rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      transition: color .18s ease;
+      white-space: nowrap;
+    }
+
+    .admin-doc-toggle-thumb {
+      position: absolute;
+      z-index: 1;
+      inset: .25rem auto .25rem .25rem;
+      width: calc(50% - .3rem);
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    .admin-doc-toggle input:not(:checked) + .admin-doc-toggle-track .admin-doc-toggle-option:first-child,
+    .admin-doc-toggle input:checked + .admin-doc-toggle-track .admin-doc-toggle-option:last-child {
+      color: var(--detail-heading);
+    }
+
+    .admin-doc-toggle input:checked + .admin-doc-toggle-track {
+      background: rgba(25, 135, 84, 0.13);
+      border-color: rgba(25, 135, 84, 0.22);
+    }
+
+    .admin-doc-toggle input:checked + .admin-doc-toggle-track .admin-doc-toggle-thumb {
+      transform: translateX(calc(100% + .1rem));
+      background: #dcfce7;
+    }
+
+    .admin-doc-toggle input:focus-visible + .admin-doc-toggle-track {
+      outline: 3px solid rgba(13, 110, 253, 0.2);
+      outline-offset: 2px;
+    }
+
     .admin-action-form textarea.form-control {
       min-height: 7.25rem;
       border-radius: 1rem;
@@ -510,6 +614,142 @@
       color: #fff;
       background: #f0a900;
       border-color: #f0a900;
+    }
+
+    .admin-message-list {
+      display: grid;
+      gap: .7rem;
+    }
+
+    .admin-message-item {
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 1.15rem;
+      background: var(--detail-soft);
+      overflow: hidden;
+    }
+
+    .admin-message-item.is-active {
+      border-color: rgba(255, 180, 0, 0.36);
+      background: linear-gradient(180deg, rgba(255, 180, 0, 0.08) 0%, var(--detail-soft) 100%);
+    }
+
+    .admin-message-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .9rem;
+      padding: .95rem 1rem;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .admin-message-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .admin-message-heading {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .admin-message-step {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 2.6rem;
+      min-height: 2.1rem;
+      padding: .25rem .65rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.06);
+      color: var(--detail-muted);
+      font-size: .74rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .admin-message-title {
+      color: var(--detail-heading);
+      font-size: .95rem;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .admin-message-badge {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 1.85rem;
+      padding: .2rem .65rem;
+      border-radius: 999px;
+      background: rgba(255, 180, 0, 0.15);
+      color: #bd8300;
+      font-size: .72rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .admin-message-badge.soft {
+      background: rgba(15, 23, 42, 0.06);
+      color: var(--detail-muted);
+    }
+
+    .admin-message-panel {
+      padding: 0 1rem 1rem;
+    }
+
+    .admin-message-action {
+      color: var(--detail-muted);
+      font-size: .86rem;
+      line-height: 1.45;
+      margin: 0 0 .85rem;
+    }
+
+    .admin-message-textarea {
+      width: 100%;
+      min-height: 13.5rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--detail-heading);
+      padding: .95rem 1rem;
+      font-size: .9rem;
+      line-height: 1.55;
+      resize: vertical;
+      white-space: pre-wrap;
+    }
+
+    .admin-message-actions {
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+      flex-wrap: wrap;
+      margin-top: .8rem;
+    }
+
+    .admin-message-actions .btn {
+      min-height: 2.75rem;
+      border-radius: .9rem;
+      padding: 0 .9rem;
+      font-size: .85rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+    }
+
+    .admin-message-subject-group {
+      margin-bottom: .75rem;
+    }
+
+    .admin-message-subject-group .form-control,
+    .admin-message-subject-group .btn {
+      min-height: 2.75rem;
+      border-radius: .9rem;
+      font-size: .86rem;
     }
 
     .admin-amount-panel {
@@ -712,12 +952,15 @@
 
     [data-bs-theme="dark"] .admin-amount-mode-label,
     [data-bs-theme="dark"] .admin-amount-preview,
+    [data-bs-theme="dark"] .admin-message-item,
+    [data-bs-theme="dark"] .admin-message-textarea,
     [data-bs-theme="dark"] .admin-financial-history-item,
     [data-bs-theme="dark"] .admin-financial-history-empty,
     [data-bs-theme="dark"] .admin-financial-history-value {
       border-color: rgba(255, 255, 255, 0.08);
     }
 
+    [data-bs-theme="dark"] .admin-message-textarea,
     [data-bs-theme="dark"] .admin-financial-history-value {
       background: rgba(255, 255, 255, 0.03);
     }
@@ -746,9 +989,17 @@
       .admin-document-top,
       .admin-document-links,
       .admin-detail-toolbar,
-      .admin-detail-actions {
+      .admin-detail-actions,
+      .admin-message-summary,
+      .admin-message-actions {
         flex-direction: column;
         align-items: flex-start;
+      }
+
+      .admin-message-actions .btn,
+      .admin-message-actions a.btn {
+        width: 100%;
+        justify-content: center;
       }
     }
   </style>
@@ -915,7 +1166,13 @@
     </div>
     <div class="admin-detail-kpi">
       <div class="admin-detail-kpi-label">Pièces</div>
-      <div class="admin-detail-kpi-value">{{ $fr->documentsComplete() ? 'Complètes' : 'Incomplètes' }}</div>
+      <div class="admin-detail-kpi-value">
+        @if ($fr->documentsComplete() && in_array($fr->status, [\App\Models\FundingRequest::STATUS_AWAITING_DOCUMENTS, \App\Models\FundingRequest::STATUS_PRELIMINARY_ACCEPTED], true))
+          À valider
+        @else
+          {{ $fr->documentsComplete() ? 'Validées' : 'Incomplètes' }}
+        @endif
+      </div>
     </div>
   </div>
 </section>
@@ -973,6 +1230,63 @@
       <div class="text-body-secondary" style="white-space: pre-wrap;">{{ $fr->situation }}</div>
     </div>
 
+    @if (!empty($adminMessages))
+      <div class="admin-detail-card" id="admin-dossier-messages">
+        <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-2">
+          <div class="admin-detail-section-title mb-0">Messages à copier</div>
+          <a href="{{ route('admin.message-templates.edit', ['langue' => $clientLocale]) }}" class="btn btn-sm btn-outline-secondary">
+            <i class="ai-file-text me-1"></i>
+            Modifier les modèles
+          </a>
+        </div>
+        <p class="admin-detail-section-note">
+          Ces textes viennent des modèles enregistrés dans la langue du client. Copiez l’objet ou le message depuis le dossier.
+        </p>
+
+        <div class="admin-message-list">
+          @foreach ($adminMessages as $message)
+            @php
+              $messageId = 'admin-message-'.$message['key'];
+              $subjectId = 'admin-message-subject-'.$message['key'];
+            @endphp
+            <details class="admin-message-item {{ $message['active'] ? 'is-active' : '' }}" @if($message['active']) open @endif>
+              <summary class="admin-message-summary">
+                <span class="admin-message-heading">
+                  <span class="admin-message-step">Étape {{ $message['step'] }}</span>
+                  <span class="admin-message-title">{{ $message['title'] }}</span>
+                </span>
+                @if ($message['active'])
+                  <span class="admin-message-badge">À utiliser</span>
+                @endif
+              </summary>
+
+              <div class="admin-message-panel">
+                <p class="admin-message-action">{{ $message['action'] }}</p>
+
+                <label class="admin-info-item-label" for="{{ $subjectId }}">Objet conseillé</label>
+                <div class="input-group admin-message-subject-group">
+                  <input id="{{ $subjectId }}" type="text" class="form-control" value="{{ $message['subject'] }}" readonly>
+                  <button type="button" class="btn btn-outline-secondary" data-copy-input="{{ $subjectId }}">
+                    <i class="ai-copy"></i>
+                    Copier l’objet
+                  </button>
+                </div>
+
+                <textarea id="{{ $messageId }}" class="admin-message-textarea" readonly>{{ $message['body'] }}</textarea>
+
+                <div class="admin-message-actions">
+                  <button type="button" class="btn btn-outline-secondary" data-copy-textarea="{{ $messageId }}">
+                    <i class="ai-copy"></i>
+                    Copier le message
+                  </button>
+                </div>
+              </div>
+            </details>
+          @endforeach
+        </div>
+      </div>
+    @endif
+
     @if ($fr->status === \App\Models\FundingRequest::STATUS_REFUSED && filled($fr->refused_reason))
       <div class="admin-detail-card">
         <div class="admin-detail-section-title">Motif du refus</div>
@@ -982,12 +1296,14 @@
 
     <div class="admin-detail-card">
       <div class="admin-detail-section-title">Pièces du client</div>
-      <p class="admin-detail-section-note">Retrouvez ici les pièces déposées par le client pour compléter sa demande.</p>
+      <p class="admin-detail-section-note">Retrouvez ici les pièces déposées. Quand toutes les pièces sont transmises, le lien client renvoie vers la page merci avec l’attente de vérification.</p>
 
       @if ($fr->public_slug)
         <div class="admin-document-share">
           <div class="admin-info-item-label">Lien à envoyer au client</div>
-          <div class="admin-info-item-value mb-3">Ce lien permet au client de compléter son dossier et de déposer ses pièces.</div>
+          <div class="admin-info-item-value mb-3">
+            {{ $fr->documentsComplete() ? 'Les pièces sont transmises : ce lien n’est plus requis côté client.' : 'Ce lien permet au client de compléter son dossier et de déposer ses pièces.' }}
+          </div>
           <div class="input-group admin-document-share-input">
             <input
               type="text"
@@ -1116,12 +1432,38 @@
         </form>
       @endif
 
+      @if (in_array($fr->status, [\App\Models\FundingRequest::STATUS_AWAITING_DOCUMENTS, \App\Models\FundingRequest::STATUS_PRELIMINARY_ACCEPTED], true) && $fr->documentsComplete())
+        <form method="post" action="{{ route('admin.funding-requests.documents-decision', $fr) }}" class="admin-doc-decision" onsubmit="return confirm('Appliquer cette décision sur les pièces déposées ?');">
+          @csrf
+          <input type="hidden" name="documents_decision" value="correction">
+          <div class="admin-doc-decision-row">
+            <div>
+              <div class="admin-doc-decision-label">Pièces conformes</div>
+            </div>
+            <label class="admin-doc-toggle" for="documentsDecisionSwitch">
+              <input type="checkbox" role="switch" id="documentsDecisionSwitch" name="documents_decision" value="valid">
+              <span class="admin-doc-toggle-track" aria-hidden="true">
+                <span class="admin-doc-toggle-option">À refaire</span>
+                <span class="admin-doc-toggle-option">Conforme</span>
+                <span class="admin-doc-toggle-thumb"></span>
+              </span>
+              <span class="visually-hidden">Pièces conformes</span>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-outline-secondary w-100">
+            Appliquer
+          </button>
+        </form>
+      @elseif (in_array($fr->status, [\App\Models\FundingRequest::STATUS_AWAITING_DOCUMENTS, \App\Models\FundingRequest::STATUS_PRELIMINARY_ACCEPTED], true))
+        <div class="admin-action-help">Le client peut encore compléter ses pièces avec le lien sécurisé.</div>
+      @endif
+
       @if (in_array($fr->status, [\App\Models\FundingRequest::STATUS_DOCUMENTS_RECEIVED, \App\Models\FundingRequest::STATUS_DONATION_ACT_SENT], true))
-        <form method="post" action="{{ route('admin.funding-requests.send-act', $fr) }}" onsubmit="return confirm('Accorder le don et envoyer le document au client ?');">
+        <form method="post" action="{{ route('admin.funding-requests.send-act', $fr) }}" onsubmit="return confirm('Accorder le don et envoyer l’acte de donation au client ?');">
           @csrf
           <button type="submit" class="btn btn-success w-100 text-start text-wrap" style="white-space: normal;">
             @if ($fr->status === \App\Models\FundingRequest::STATUS_DONATION_ACT_SENT)
-              <span class="d-block fw-semibold">Renvoyer le document</span>
+              <span class="d-block fw-semibold">Renvoyer l’acte</span>
             @else
               <span class="d-block fw-semibold">Accorder le don</span>
             @endif
@@ -1337,23 +1679,64 @@
 function copyAdminLink(inputId, btn) {
   var input = document.getElementById(inputId);
   if (!input) return;
-  var value = input.value || '';
+  copyAdminValue(input.value || '', btn);
+}
+
+function copyAdminInput(inputId, btn) {
+  var input = document.getElementById(inputId);
+  if (!input) return;
+  copyAdminValue(input.value || '', btn);
+}
+
+function copyAdminValue(value, btn) {
+  if (!btn) return;
+  var oldHtml = btn.innerHTML;
+
+  function confirmCopy() {
+    btn.innerHTML = '<i class="ai-check"></i> Copié';
+    setTimeout(function () { btn.innerHTML = oldHtml; }, 1200);
+  }
+
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(value).then(function () {
-      var oldText = btn.textContent;
-      btn.textContent = 'Lien copie';
-      setTimeout(function () { btn.textContent = oldText; }, 1200);
-    });
+    navigator.clipboard.writeText(value).then(confirmCopy);
     return;
   }
-  input.select();
+
+  var temp = document.createElement('textarea');
+  temp.value = value;
+  temp.setAttribute('readonly', '');
+  temp.style.position = 'fixed';
+  temp.style.opacity = '0';
+  document.body.appendChild(temp);
+  temp.focus();
+  temp.select();
   document.execCommand('copy');
-  var oldText = btn.textContent;
-  btn.textContent = 'Lien copie';
-  setTimeout(function () { btn.textContent = oldText; }, 1200);
+  document.body.removeChild(temp);
+  confirmCopy();
+}
+
+function copyAdminTextarea(textareaId, btn) {
+  var textarea = document.getElementById(textareaId);
+  if (!textarea) return;
+  var value = textarea.value || textarea.textContent || '';
+  copyAdminValue(value, btn);
 }
 
 document.addEventListener('click', function (event) {
+  var copyInputTrigger = event.target.closest('[data-copy-input]');
+  if (copyInputTrigger) {
+    event.preventDefault();
+    copyAdminInput(copyInputTrigger.getAttribute('data-copy-input'), copyInputTrigger);
+    return;
+  }
+
+  var copyTrigger = event.target.closest('[data-copy-textarea]');
+  if (copyTrigger) {
+    event.preventDefault();
+    copyAdminTextarea(copyTrigger.getAttribute('data-copy-textarea'), copyTrigger);
+    return;
+  }
+
   var trigger = event.target.closest('[data-preview-url]');
   if (!trigger) return;
 

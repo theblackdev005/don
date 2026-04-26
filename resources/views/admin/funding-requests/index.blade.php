@@ -242,8 +242,8 @@
   $filters = [
     ['label' => 'Toutes', 'value' => ''],
     ['label' => 'À examiner', 'value' => \App\Models\FundingRequest::STATUS_PENDING],
-    ['label' => 'À compléter', 'value' => \App\Models\FundingRequest::STATUS_AWAITING_DOCUMENTS],
-    ['label' => 'À décider', 'value' => \App\Models\FundingRequest::STATUS_DOCUMENTS_RECEIVED],
+    ['label' => 'Pièces à vérifier', 'value' => \App\Models\FundingRequest::STATUS_AWAITING_DOCUMENTS],
+    ['label' => 'Pièces validées', 'value' => \App\Models\FundingRequest::STATUS_DOCUMENTS_RECEIVED],
     ['label' => 'Confirmés', 'value' => \App\Models\FundingRequest::STATUS_DONATION_ACT_SENT],
     ['label' => 'Archivés', 'value' => \App\Models\FundingRequest::STATUS_REFUSED],
     ['label' => 'Clôturés', 'value' => \App\Models\FundingRequest::STATUS_CLOSED],
@@ -293,8 +293,8 @@
               [$statusClass, $statusLabel] = match ($r->status) {
                 \App\Models\FundingRequest::STATUS_PENDING => ['pending', 'À examiner'],
                 \App\Models\FundingRequest::STATUS_PRELIMINARY_ACCEPTED,
-                \App\Models\FundingRequest::STATUS_AWAITING_DOCUMENTS => ['info', 'À compléter'],
-                \App\Models\FundingRequest::STATUS_DOCUMENTS_RECEIVED => ['success', 'À décider'],
+                \App\Models\FundingRequest::STATUS_AWAITING_DOCUMENTS => ['info', $r->documentsComplete() ? 'Pièces à valider' : 'À compléter'],
+                \App\Models\FundingRequest::STATUS_DOCUMENTS_RECEIVED => ['success', 'Pièces validées'],
                 \App\Models\FundingRequest::STATUS_DONATION_ACT_SENT => ['primary', 'Confirmé'],
                 \App\Models\FundingRequest::STATUS_REFUSED => ['secondary', 'Archivé'],
                 \App\Models\FundingRequest::STATUS_CLOSED => ['secondary', 'Clôturé'],

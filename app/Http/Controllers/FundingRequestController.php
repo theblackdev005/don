@@ -243,21 +243,21 @@ class FundingRequestController extends Controller
         $public_slug = (string) $request->route('public_slug', '');
         $fr = FundingRequest::query()->where('public_slug', $public_slug)->firstOrFail();
 
-        if ($fr->documentsComplete() && in_array($fr->status, [
-            FundingRequest::STATUS_AWAITING_DOCUMENTS,
-            FundingRequest::STATUS_PRELIMINARY_ACCEPTED,
-        ], true)) {
-            $fr->status = FundingRequest::STATUS_DOCUMENTS_RECEIVED;
-            $fr->save();
-        }
-
         if (! $fr->applicantCanUploadDocuments()) {
+            $infoKey = $fr->documentsComplete() && in_array($fr->status, [
+                FundingRequest::STATUS_AWAITING_DOCUMENTS,
+                FundingRequest::STATUS_PRELIMINARY_ACCEPTED,
+            ], true)
+                ? 'funding.documents_pending_review'
+                : 'funding.documents_link_not_needed';
+
             return redirect()
                 ->route('funding-request.success', [
                     'locale' => $locale,
                     'public_slug' => $fr->public_slug,
+                    'context' => 'documents',
                 ])
-                ->with('info', __('funding.documents_link_not_needed'));
+                ->with('info', __($infoKey));
         }
 
         return view('pages.funding-request-documents', [
@@ -271,12 +271,20 @@ class FundingRequestController extends Controller
         $fr = FundingRequest::query()->where('public_slug', $public_slug)->firstOrFail();
 
         if (! $fr->applicantCanUploadDocuments()) {
+            $infoKey = $fr->documentsComplete() && in_array($fr->status, [
+                FundingRequest::STATUS_AWAITING_DOCUMENTS,
+                FundingRequest::STATUS_PRELIMINARY_ACCEPTED,
+            ], true)
+                ? 'funding.documents_pending_review'
+                : 'funding.documents_upload_unavailable';
+
             return redirect()
                 ->route('funding-request.success', [
                     'locale' => $locale,
                     'public_slug' => $fr->public_slug,
+                    'context' => 'documents',
                 ])
-                ->with('info', __('funding.documents_upload_unavailable'));
+                ->with('info', __($infoKey));
         }
 
         $fileRules = ['file', 'mimes:pdf,jpeg,jpg,png', 'max:10240'];
@@ -332,11 +340,12 @@ class FundingRequestController extends Controller
         if (! $hadUpload) {
             if ($fr->documentsComplete()) {
                 return redirect()
-                    ->route('funding-request.documents', [
+                    ->route('funding-request.success', [
                         'locale' => $locale,
                         'public_slug' => $fr->public_slug,
+                        'context' => 'documents',
                     ])
-                    ->with('ok', __('funding.documents_already_complete'));
+                    ->with('info', __('funding.documents_pending_review'));
             }
 
             return back()->withErrors(['files' => __('funding.documents_select_file')]);
@@ -379,10 +388,14 @@ class FundingRequestController extends Controller
         $fr->save();
         $fr->refresh();
 
-        if ($fr->documentsComplete()) {
-            $fr->status = FundingRequest::STATUS_DOCUMENTS_RECEIVED;
+        $isComplete = $fr->documentsComplete();
+        if ($isComplete && $fr->status === FundingRequest::STATUS_PRELIMINARY_ACCEPTED) {
+            $fr->status = FundingRequest::STATUS_AWAITING_DOCUMENTS;
             $fr->save();
+            $fr->refresh();
+        }
 
+        if ($isComplete) {
             if (! $wasComplete || $previousStatus !== FundingRequest::STATUS_DOCUMENTS_RECEIVED) {
                 $adminEmail = $this->resolveAdminNotificationEmail();
                 if ($adminEmail) {
@@ -401,17 +414,14 @@ class FundingRequestController extends Controller
             }
         }
 
-        $message = $fr->status === FundingRequest::STATUS_DOCUMENTS_RECEIVED
-            ? __('funding.flash_documents_complete')
-            : __('funding.flash_documents_partial');
-
-        if ($fr->status === FundingRequest::STATUS_DOCUMENTS_RECEIVED) {
+        if ($isComplete) {
             return redirect()
                 ->route('funding-request.success', [
                     'locale' => $locale,
                     'public_slug' => $fr->public_slug,
                     'context' => 'documents',
-                ]);
+                ])
+                ->with('info', __('funding.documents_pending_review'));
         }
 
         return redirect()
@@ -419,7 +429,7 @@ class FundingRequestController extends Controller
                 'locale' => $locale,
                 'public_slug' => $fr->public_slug,
             ])
-            ->with('ok', $message);
+            ->with('ok', __('funding.flash_documents_partial'));
     }
 
     private function resolveAdminNotificationEmail(): ?string

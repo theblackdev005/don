@@ -251,6 +251,7 @@
   ];
   $adminSiteNav = [
       ['key' => 'settings', 'route' => 'admin.settings.edit', 'icon' => 'ai-settings', 'label' => 'Configuration'],
+      ['key' => 'message-templates', 'route' => 'admin.message-templates.edit', 'icon' => 'ai-file-text', 'label' => 'Modèles de messages'],
       ['key' => 'testimonials', 'route' => 'admin.testimonials.index', 'icon' => 'ai-messages', 'label' => 'Témoignages'],
   ];
   $adminToolsNav = [

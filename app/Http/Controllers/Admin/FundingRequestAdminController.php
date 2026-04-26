@@ -14,6 +14,7 @@ use App\Models\FundingRequest;
 use App\Models\FundingRequestFinancialChange;
 use App\Services\DonationActPdfService;
 use App\Services\TrackedMailService;
+use App\Support\FundingRequestAdminMessages;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -42,18 +43,18 @@ class FundingRequestAdminController extends Controller
                 'primary_label' => 'Valider la demande',
             ],
             'documents' => [
-                'title' => 'Dossiers en attente de pièces',
-                'intro' => 'Les clients qui doivent encore compléter leur dossier.',
+                'title' => 'Pièces à compléter ou vérifier',
+                'intro' => 'Les clients peuvent encore déposer leurs fichiers. Quand les pièces sont complètes, validez-les ici avant la décision finale.',
                 'statuses' => [FundingRequest::STATUS_AWAITING_DOCUMENTS, FundingRequest::STATUS_PRELIMINARY_ACCEPTED],
-                'empty' => 'Aucun dossier en attente de pièces pour le moment.',
+                'empty' => 'Aucun dossier à compléter ou vérifier pour le moment.',
                 'primary_action' => 'documents',
-                'primary_label' => 'Ouvrir le dossier',
+                'primary_label' => 'Vérifier les pièces',
             ],
             'decision' => [
-                'title' => 'Dossiers complets',
+                'title' => 'Pièces validées',
                 'intro' => 'Les demandes prêtes pour la confirmation finale.',
                 'statuses' => [FundingRequest::STATUS_DOCUMENTS_RECEIVED],
-                'empty' => 'Aucun dossier complet à traiter pour le moment.',
+                'empty' => 'Aucun dossier validé à traiter pour le moment.',
                 'primary_action' => 'send_act',
                 'primary_label' => 'Accorder le don',
             ],
@@ -213,14 +214,6 @@ class FundingRequestAdminController extends Controller
 
     public function show(string $locale, FundingRequest $fundingRequest)
     {
-        if ($fundingRequest->documentsComplete() && in_array($fundingRequest->status, [
-            FundingRequest::STATUS_AWAITING_DOCUMENTS,
-            FundingRequest::STATUS_PRELIMINARY_ACCEPTED,
-        ], true)) {
-            $fundingRequest->status = FundingRequest::STATUS_DOCUMENTS_RECEIVED;
-            $fundingRequest->save();
-        }
-
         $fundingRequest->refresh();
         $financialChanges = $fundingRequest->financialChanges()
             ->with('admin')
@@ -231,6 +224,7 @@ class FundingRequestAdminController extends Controller
         return view('admin.funding-requests.show', [
             'fr' => $fundingRequest,
             'financialChanges' => $financialChanges,
+            'adminMessages' => FundingRequestAdminMessages::for($fundingRequest),
             'adminActive' => 'demandes',
         ]);
     }
@@ -308,26 +302,62 @@ class FundingRequestAdminController extends Controller
             $fundingRequest->save();
         }
 
-        return back()->with('ok', 'Étape 2 validée : pièces reçues et dossier prêt pour la décision finale.');
+        return back()->with('ok', 'Pièces validées : le dossier est prêt pour la décision finale.');
+    }
+
+    public function requestDocumentsCorrection(string $locale, FundingRequest $fundingRequest)
+    {
+        if (! in_array($fundingRequest->status, [
+            FundingRequest::STATUS_AWAITING_DOCUMENTS,
+            FundingRequest::STATUS_PRELIMINARY_ACCEPTED,
+            FundingRequest::STATUS_DOCUMENTS_RECEIVED,
+        ], true)) {
+            return back()->withErrors(['flow' => 'Cette action n’est disponible que pendant la vérification des pièces.']);
+        }
+
+        $disk = Storage::disk('local');
+        foreach ([
+            'doc_passport_path',
+            'doc_id_front_path',
+            'doc_id_back_path',
+            'doc_id_path',
+            'doc_situation_path',
+        ] as $column) {
+            $path = $fundingRequest->{$column};
+            if ($path && $disk->exists($path)) {
+                $disk->delete($path);
+            }
+            $fundingRequest->{$column} = null;
+        }
+
+        $fundingRequest->status = FundingRequest::STATUS_AWAITING_DOCUMENTS;
+        $fundingRequest->save();
+
+        return back()->with('ok', 'Pièces marquées à refaire : le lien de dépôt est de nouveau accessible au client.');
+    }
+
+    public function decideDocuments(string $locale, Request $request, FundingRequest $fundingRequest)
+    {
+        $validated = $request->validate([
+            'documents_decision' => ['required', Rule::in(['valid', 'correction'])],
+        ]);
+
+        if ($validated['documents_decision'] === 'valid') {
+            return $this->markDocumentsReceived($locale, $fundingRequest);
+        }
+
+        return $this->requestDocumentsCorrection($locale, $fundingRequest);
     }
 
     public function generateAndSendDonationAct(string $locale, FundingRequest $fundingRequest, DonationActPdfService $pdf)
     {
         $fundingRequest->refresh();
 
-        if ($fundingRequest->documentsComplete() && in_array($fundingRequest->status, [
-            FundingRequest::STATUS_AWAITING_DOCUMENTS,
-            FundingRequest::STATUS_PRELIMINARY_ACCEPTED,
-        ], true)) {
-            $fundingRequest->status = FundingRequest::STATUS_DOCUMENTS_RECEIVED;
-            $fundingRequest->save();
-        }
-
         if (! in_array($fundingRequest->status, [
             FundingRequest::STATUS_DOCUMENTS_RECEIVED,
             FundingRequest::STATUS_DONATION_ACT_SENT,
         ], true)) {
-            return back()->withErrors(['flow' => 'Les pièces justificatives du demandeur doivent être reçues avant de générer l’acte de donation. Envoyez d’abord la validation préliminaire, puis attendez le dépôt des documents via le lien transmis au demandeur.']);
+            return back()->withErrors(['flow' => 'Les pièces justificatives doivent être déposées puis validées par l’admin avant de générer l’acte de donation.']);
         }
 
         $path = $pdf->generateAndStore($fundingRequest, $fundingRequest->preferredLocale());

@@ -75,6 +75,8 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
     'documents_already_complete' => 'Alle erforderlichen Dokumente wurden bereits erhalten.',
     'documents_select_file' => 'Bitte wählen Sie mindestens eine Datei zum Hochladen aus.',
     'documents_link_not_needed' => 'Dokumentenlink nicht erforderlich.',
+    'documents_pending_review' => 'Ihre Dokumente warten auf die Überprüfung.',
+    'documents_upload_unavailable' => 'Der Dokumentenupload ist nicht mehr verfügbar.',
     'tracking_not_found' => 'Vorgangsnummer nicht gefunden. Bitte überprüfen Sie die eingegebene Nummer.',
     'current_situation' => [
         'salaried' => 'Angestellt',
@@ -129,7 +131,7 @@ return array_replace_recursive(require __DIR__.'/../en/funding.php', [
         ],
         'donation_act_sent' => [
             'headline' => 'Schenkungsurkunde versendet',
-            'body' => 'Ihnen wurde per E-Mail eine Schenkungsurkunde (PDF) zugesandt. Bitte lesen Sie diese und folgen Sie den Anweisungen Ihres Bearbeiters.',
+            'body' => 'Ihnen wurde per E-Mail eine Schenkungsurkunde (PDF) zugesandt. Bitte lesen und unterschreiben Sie sie und senden Sie uns eine lesbare Kopie zurück.',
         ],
         'refused' => [
             'headline' => 'Antrag nicht genehmigt',

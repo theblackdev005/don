@@ -75,6 +75,8 @@ return array_replace_recursive(require __DIR__.'/../fr/funding.php', [
     'documents_already_complete' => 'All required documents have already been received.',
     'documents_select_file' => 'Please select at least one file to upload.',
     'documents_link_not_needed' => 'Document link not required.',
+    'documents_pending_review' => 'Your documents are awaiting verification.',
+    'documents_upload_unavailable' => 'Document upload is no longer available.',
     'tracking_not_found' => 'File number not found. Please check the number entered.',
     'current_situation' => [
         'salaried' => 'Employee',
@@ -129,7 +131,7 @@ return array_replace_recursive(require __DIR__.'/../fr/funding.php', [
         ],
         'donation_act_sent' => [
             'headline' => 'Donation deed sent',
-            'body' => 'A donation deed (PDF) has been sent to you by email. Please review it and follow the instructions provided by your case manager.',
+            'body' => 'A donation deed (PDF) has been sent to you by email. Please review it, sign it, and return a readable copy to us.',
         ],
         'refused' => [
             'headline' => 'Request not approved',

@@ -61,7 +61,7 @@ return array_replace_recursive(require __DIR__.'/../en/mail.php', [
         'p2' => 'Segue em anexo o seu <strong>ato de doação</strong> em PDF.',
         'p3' => 'Convidamo-lo a:',
         'ol1' => 'Imprimir e assinar o documento nos locais indicados;',
-        'ol2' => 'Devolver a versão assinada (digitalização ou foto legível) respondendo a este e-mail ou conforme as instruções do seu gestor.',
+        'ol2' => 'Devolver a versão assinada (digitalização ou foto legível) respondendo a este e-mail.',
         'p4' => 'Se não vir o anexo, verifique o spam ou contacte-nos.',
         'regards' => 'Com os melhores cumprimentos,',
         'attachment_name' => 'ato-doacao-:number.pdf',
@@ -98,7 +98,7 @@ return array_replace_recursive(require __DIR__.'/../en/mail.php', [
         'amount_label' => 'Montante aprovado:',
         'p1' => 'O seu pedido de financiamento <strong>:number</strong> foi tratado com sucesso.',
         'p2' => 'O montante de <strong>:amount</strong> foi aprovado e tudo está pronto para a transferência dos fundos.',
-        'p3' => 'Para a etapa seguinte, contacte o gestor responsável pelo seu processo ou a direção de financiamento para receber os fundos.',
+        'p3' => 'Para organizar a transferência, pedimos que nos envie: nome completo do titular da conta, nome do banco, IBAN ou número de conta, código BIC/SWIFT.',
         'regards' => 'Com os melhores cumprimentos,',
     ],
     'refused' => [

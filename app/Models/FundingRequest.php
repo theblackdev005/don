@@ -262,11 +262,10 @@ class FundingRequest extends Model
             return false;
         }
 
-        if ($this->status === self::STATUS_AWAITING_DOCUMENTS) {
-            return true;
-        }
-
-        return $this->status === self::STATUS_PRELIMINARY_ACCEPTED && ! $this->documentsComplete();
+        return in_array($this->status, [
+            self::STATUS_AWAITING_DOCUMENTS,
+            self::STATUS_PRELIMINARY_ACCEPTED,
+        ], true) && ! $this->documentsComplete();
     }
 
     /** Téléchargement de l’acte (PDF) via le lien sécurisé par public_slug (suivi / e-mail). */
@@ -298,7 +297,9 @@ class FundingRequest extends Model
             ],
             self::STATUS_AWAITING_DOCUMENTS => [
                 'headline' => __('funding.tracking.awaiting_documents.headline'),
-                'body' => __('funding.tracking.awaiting_documents.body'),
+                'body' => $this->documentsComplete()
+                    ? __('funding.tracking.awaiting_documents.body_complete')
+                    : __('funding.tracking.awaiting_documents.body'),
             ],
             self::STATUS_DOCUMENTS_RECEIVED => [
                 'headline' => __('funding.tracking.documents_received.headline'),

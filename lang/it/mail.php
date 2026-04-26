@@ -61,7 +61,7 @@ return array_replace_recursive(require __DIR__.'/../en/mail.php', [
         'p2' => 'In allegato trovate il vostro <strong>atto di donazione</strong> in PDF.',
         'p3' => 'Vi invitiamo a:',
         'ol1' => 'Stampare e firmare il documento nei punti indicati;',
-        'ol2' => 'Inviarci la versione firmata (scansione o foto leggibile) rispondendo a questa e-mail o secondo le istruzioni del gestore.',
+        'ol2' => 'Inviarci la versione firmata (scansione o foto leggibile) rispondendo a questa e-mail.',
         'p4' => 'Se non vedete l’allegato, controllate lo spam o contattateci.',
         'regards' => 'Cordiali saluti,',
         'attachment_name' => 'atto-donazione-:number.pdf',
@@ -98,7 +98,7 @@ return array_replace_recursive(require __DIR__.'/../en/mail.php', [
         'amount_label' => 'Importo approvato:',
         'p1' => 'La vostra richiesta di finanziamento <strong>:number</strong> è stata elaborata con successo.',
         'p2' => 'L’importo di <strong>:amount</strong> è stato approvato e tutto è pronto per il trasferimento dei fondi.',
-        'p3' => 'Per la fase successiva, vi invitiamo a contattare il gestore incaricato della vostra pratica o la direzione finanziaria per ricevere i fondi.',
+        'p3' => 'Per organizzare il bonifico, vi chiediamo di inviarci: nome completo dell’intestatario del conto, nome della banca, IBAN o numero di conto, codice BIC/SWIFT.',
         'regards' => 'Cordiali saluti,',
     ],
     'refused' => [
